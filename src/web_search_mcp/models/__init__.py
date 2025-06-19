@@ -1,9 +1,23 @@
 """
-Data models for MCP Scaffolding
+Data models for Web Search MCP Server
 
-This package contains Pydantic models for data validation and serialization.
+This package contains Pydantic models for web search data validation and serialization.
 """
 
-from .example_models import ExampleData, ExampleTool
+from .search_models import (
+    SearchRequest,
+    SearchResult,
+    SearchResponse,
+    SearchConfig,
+    ContentExtract,
+    SearchStats,
+)
 
-__all__ = ["ExampleTool", "ExampleData"]
+__all__ = [
+    "SearchRequest",
+    "SearchResult", 
+    "SearchResponse",
+    "SearchConfig",
+    "ContentExtract",
+    "SearchStats",
+]

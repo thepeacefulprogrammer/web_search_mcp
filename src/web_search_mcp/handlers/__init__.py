@@ -1,18 +1,20 @@
 """
-Handler modules for MCP Scaffolding
+Handler modules for Web Search MCP Server
 
-This package contains handler functions for MCP tools.
-Each handler module should contain the business logic for specific MCP tools.
+This package contains handler functions for web search MCP tools.
+Each handler module should contain the business logic for specific search functionalities.
 """
 
-from .example_handlers import (
-    create_example_tool_handler,
-    get_example_data_handler,
-    initialize_example_handlers,
+from .search_handlers import (
+    web_search_handler,
+    get_search_config_handler,
+    health_check_handler,
+    initialize_search_handlers,
 )
 
 __all__ = [
-    "create_example_tool_handler",
-    "get_example_data_handler",
-    "initialize_example_handlers",
+    "web_search_handler",
+    "get_search_config_handler",
+    "health_check_handler",
+    "initialize_search_handlers",
 ]

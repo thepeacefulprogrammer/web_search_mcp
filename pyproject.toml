@@ -32,6 +32,9 @@ dependencies = [
     "httpx>=0.25.0",
     "asyncio-tools>=0.3.0",
     "typing-extensions>=4.8.0",
+    # Web search specific dependencies
+    "beautifulsoup4>=4.9.0",
+    "fake-useragent>=1.1.0",
 ]
 
 [project.optional-dependencies]

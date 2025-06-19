@@ -1,14 +1,14 @@
 """
-MCP Scaffolding Package
+Web Search MCP Package
 
-A template for creating Model Context Protocol (MCP) servers using FastMCP
-with modern Python best practices.
+A Model Context Protocol (MCP) server that provides web search capabilities
+using DuckDuckGo search functionality.
 """
 
 __version__ = "0.1.0"
 __author__ = "Randy Herritt"
 __email__ = "randy.herritt@gmail.com"
 
-from .server import MCPScaffoldingServer
+from .server import WebSearchMCPServer
 
-__all__ = ["MCPScaffoldingServer"]
+__all__ = ["WebSearchMCPServer"]

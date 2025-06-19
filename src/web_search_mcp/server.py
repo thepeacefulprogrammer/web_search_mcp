@@ -84,15 +84,16 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from web_search_mcp.handlers.example_handlers import (
-        create_example_tool_handler,
-        get_example_data_handler,
-        initialize_example_handlers,
+    from web_search_mcp.handlers.search_handlers import (
+        web_search_handler,
+        get_search_config_handler,
+        health_check_handler,
+        initialize_search_handlers,
     )
 
-    logger.info("Successfully imported example handlers")
+    logger.info("Successfully imported search handlers")
 except ImportError as e:
-    logger.error(f"Failed to import example handlers: {e}")
+    logger.error(f"Failed to import search handlers: {e}")
     logger.error(f"Traceback: {traceback.format_exc()}")
     sys.exit(1)
 
@@ -101,11 +102,11 @@ load_dotenv()
 logger.info("Environment variables loaded")
 
 
-class MCPScaffoldingServer:
-    """MCP Scaffolding Server using FastMCP."""
+class WebSearchMCPServer:
+    """Web Search MCP Server using FastMCP."""
 
     def __init__(self, config_path: str = None):
-        logger.info("Initializing MCPScaffoldingServer...")
+        logger.info("Initializing WebSearchMCPServer...")
 
         try:
             self.config = load_config(config_path)
@@ -125,7 +126,7 @@ class MCPScaffoldingServer:
 
         try:
             # Initialize FastMCP Server
-            server_name = self.config.get("server", {}).get("name", "mcp-scaffolding")
+            server_name = self.config.get("server", {}).get("name", "web-search-mcp")
             self.mcp = FastMCP(server_name)
             logger.info("FastMCP server created successfully")
         except Exception as e:
@@ -159,11 +160,11 @@ class MCPScaffoldingServer:
         level = getattr(logging, log_config.get("level", "INFO"))
 
         logging.getLogger().setLevel(level)
-        logger.info("MCP Scaffolding Server logging initialized")
+        logger.info("Web Search MCP Server logging initialized")
 
     def _init_sync_components(self):
         """Initialize components that can be done synchronously."""
-        logger.info("Initializing MCP Scaffolding Server components...")
+        logger.info("Initializing Web Search MCP Server components...")
 
         # Initialize auth config
         try:
@@ -192,83 +193,77 @@ class MCPScaffoldingServer:
         """Register all MCP tools."""
         logger.info("Registering MCP tools...")
 
-        # Test connection tool
+        # Health check tool
         @self.mcp.tool()
-        async def test_connection(message: str = "No message provided") -> str:
-            """Test the MCP server connection."""
-            logger.info(f"test_connection called with message: {message}")
+        async def health_check() -> str:
+            """Check the health status of the web search service."""
+            logger.info("health_check called")
             await self._ensure_async_initialized()
-            return f"✅ MCP Scaffolding Server is running! Message: {message}"
+            
+            try:
+                result = await health_check_handler()
+                logger.info("health_check completed successfully")
+                return result
+            except Exception as e:
+                logger.error(f"health_check failed: {e}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                return f"❌ Error checking health: {str(e)}"
 
-        # Example tool - replace with your actual tools
+        # Web search tool
         @self.mcp.tool()
-        async def create_example_tool(
-            name: str,
-            description: str = "",
-            category: str = "general",
+        async def web_search(
+            query: str,
+            max_results: int = 10,
         ) -> str:
-            """Create an example tool with the given parameters.
+            """Search the web for information using DuckDuckGo.
 
             Args:
-                name: The name of the tool
-                description: Optional description of the tool
-                category: The category of the tool (default: general)
+                query: The search query to execute
+                max_results: Maximum number of results to return (default: 10, max: 20)
             """
-            logger.info(f"create_example_tool called with name: {name}")
+            logger.info(f"web_search called with query: {query}")
             await self._ensure_async_initialized()
 
             try:
-                result = await create_example_tool_handler(
-                    name=name,
-                    description=description,
-                    category=category,
+                result = await web_search_handler(
+                    query=query,
+                    max_results=max_results,
                 )
-                logger.info(f"create_example_tool completed successfully")
+                logger.info("web_search completed successfully")
                 return result
             except Exception as e:
-                logger.error(f"create_example_tool failed: {e}")
+                logger.error(f"web_search failed: {e}")
                 logger.error(f"Traceback: {traceback.format_exc()}")
-                return f"❌ Error creating example tool: {str(e)}"
+                return f"❌ Error performing web search: {str(e)}"
 
-        # Example data retrieval tool
+        # Search configuration tool
         @self.mcp.tool()
-        async def get_example_data(
-            data_type: str = "all",
-            limit: int = 10,
-        ) -> str:
-            """Get example data from the server.
-
-            Args:
-                data_type: Type of data to retrieve (default: all)
-                limit: Maximum number of items to return (default: 10)
-            """
-            logger.info(f"get_example_data called with data_type: {data_type}")
+        async def get_search_config() -> str:
+            """Get the current search configuration and settings."""
+            logger.info("get_search_config called")
             await self._ensure_async_initialized()
 
             try:
-                result = await get_example_data_handler(
-                    data_type=data_type,
-                    limit=limit,
-                )
-                logger.info(f"get_example_data completed successfully")
+                result = await get_search_config_handler()
+                logger.info("get_search_config completed successfully")
                 return result
             except Exception as e:
-                logger.error(f"get_example_data failed: {e}")
+                logger.error(f"get_search_config failed: {e}")
                 logger.error(f"Traceback: {traceback.format_exc()}")
-                return f"❌ Error retrieving example data: {str(e)}"
+                return f"❌ Error retrieving search config: {str(e)}"
 
         logger.info("Tool registration complete")
 
     def run(self):
         """Run the MCP server."""
-        logger.info("Starting MCP Scaffolding Server...")
+        logger.info("Starting Web Search MCP Server...")
         # FastMCP handles the asyncio event loop internally
         self.mcp.run()
 
 
 def main():
     """Main entry point for the MCP server."""
-    parser = argparse.ArgumentParser(description="MCP Scaffolding Server")
+    parser = argparse.ArgumentParser(description="Web Search MCP Server")
     parser.add_argument(
         "--config",
         "-c",
@@ -279,7 +274,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        server = MCPScaffoldingServer(config_path=args.config)
+        server = WebSearchMCPServer(config_path=args.config)
         server.run()
     except KeyboardInterrupt:
         logger.info("Server interrupted by user")
