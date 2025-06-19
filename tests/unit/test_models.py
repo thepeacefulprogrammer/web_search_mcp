@@ -7,7 +7,7 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from mcp_scaffolding.models.example_models import (
+from web_search_mcp.models.example_models import (
     ExampleConfig,
     ExampleData,
     ExampleRequest,

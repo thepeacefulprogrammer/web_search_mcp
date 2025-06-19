@@ -74,8 +74,8 @@ except ImportError as e:
 
 # Import our modules
 try:
-    from mcp_scaffolding.utils.auth import load_auth_config
-    from mcp_scaffolding.utils.config import load_config
+    from web_search_mcp.utils.auth import load_auth_config
+    from web_search_mcp.utils.config import load_config
 
     logger.info("Successfully imported utility modules")
 except ImportError as e:
@@ -84,7 +84,7 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from mcp_scaffolding.handlers.example_handlers import (
+    from web_search_mcp.handlers.example_handlers import (
         create_example_tool_handler,
         get_example_data_handler,
         initialize_example_handlers,

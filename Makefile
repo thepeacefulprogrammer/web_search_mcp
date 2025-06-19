@@ -62,10 +62,10 @@ setup-hooks:
 
 # Server operations
 run:
-	python -m mcp_scaffolding.server
+	python -m web_search_mcp.server
 
 run-config:
-	python -m mcp_scaffolding.server --config config/config.yaml
+	python -m web_search_mcp.server --config config/config.yaml
 
 # Utility
 clean:

@@ -78,13 +78,13 @@ pre-commit install
 
 ```bash
 # Run the MCP server
-python -m mcp_scaffolding.server
+python -m web_search_mcp.server
 
 # Or run with custom config
-python -m mcp_scaffolding.server --config config/my_config.yaml
+python -m web_search_mcp.server --config config/my_config.yaml
 
 # Or use the console script (after pip install)
-mcp-scaffolding-server
+web-search-mcp-server
 ```
 
 ### 4. Test Your Server
@@ -104,9 +104,9 @@ pytest -m integration
 ## Project Structure
 
 ```
-my_mcp_scaffolding/
+my_web_search_mcp/
 ├── src/
-│   └── mcp_scaffolding/           # Main package
+│   └── web_search_mcp/           # Main package
 │       ├── __init__.py
 │       ├── server.py              # Main MCP server
 │       ├── handlers/              # MCP tool handlers
@@ -169,8 +169,8 @@ The scaffolding comes with 3 example MCP tools that you can test immediately:
 
 The scaffolding includes example handlers and models that you should replace:
 
-- `src/mcp_scaffolding/handlers/example_handlers.py` - Replace with your MCP tool logic
-- `src/mcp_scaffolding/models/example_models.py` - Replace with your data models
+- `src/web_search_mcp/handlers/example_handlers.py` - Replace with your MCP tool logic
+- `src/web_search_mcp/models/example_models.py` - Replace with your data models
 - `tests/unit/test_example_*.py` - Update tests for your code
 
 ### 2. Add New MCP Tools
@@ -380,7 +380,7 @@ except Exception as e:
 
 3. **Run server**:
    ```bash
-   python -m mcp_scaffolding.server --config config/production.yaml
+   python -m web_search_mcp.server --config config/production.yaml
    ```
 
 ### Docker Deployment
@@ -395,7 +395,7 @@ COPY . .
 RUN pip install .
 
 EXPOSE 8000
-CMD ["python", "-m", "mcp_scaffolding.server"]
+CMD ["python", "-m", "web_search_mcp.server"]
 ```
 
 ### Systemd Service
@@ -411,7 +411,7 @@ After=network.target
 Type=simple
 User=mcp
 WorkingDirectory=/opt/mcp-server
-ExecStart=/opt/mcp-server/venv/bin/python -m mcp_scaffolding.server
+ExecStart=/opt/mcp-server/venv/bin/python -m web_search_mcp.server
 Restart=always
 
 [Install]

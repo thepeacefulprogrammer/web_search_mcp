@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from mcp_scaffolding.handlers.example_handlers import (
+from web_search_mcp.handlers.example_handlers import (
     clear_example_data,
     create_example_tool_handler,
     delete_example_tool_handler,
@@ -16,7 +16,7 @@ from mcp_scaffolding.handlers.example_handlers import (
     initialize_example_handlers,
     list_example_tools_handler,
 )
-from mcp_scaffolding.models.example_models import ExampleData, ExampleTool
+from web_search_mcp.models.example_models import ExampleData, ExampleTool
 
 
 class TestExampleHandlers:

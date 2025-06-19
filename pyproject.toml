@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mcp-scaffolding"
+name = "web-search-mcp"
 version = "0.1.0"
-description = "A scaffolding template for creating Model Context Protocol (MCP) servers using FastMCP with modern Python best practices"
+description = "A Model Context Protocol (MCP) server that provides web search capabilities to AI assistants"
 authors = [
     {name = "Randy Herritt", email = "randy.herritt@gmail.com"}
 ]
@@ -21,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-keywords = ["mcp", "model-context-protocol", "fastmcp", "scaffolding", "template"]
+keywords = ["mcp", "model-context-protocol", "web-search", "search", "fastmcp"]
 
 dependencies = [
     "mcp>=1.0.0",
@@ -50,13 +50,13 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/mcp-scaffolding"
-Repository = "https://github.com/your-org/mcp-scaffolding"
-Documentation = "https://github.com/your-org/mcp-scaffolding#readme"
-"Bug Tracker" = "https://github.com/your-org/mcp-scaffolding/issues"
+Homepage = "https://github.com/your-org/web-search-mcp"
+Repository = "https://github.com/your-org/web-search-mcp"
+Documentation = "https://github.com/your-org/web-search-mcp#readme"
+"Bug Tracker" = "https://github.com/your-org/web-search-mcp/issues"
 
 [project.scripts]
-mcp-scaffolding-server = "mcp_scaffolding.server:main"
+web-search-mcp-server = "web_search_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -101,7 +101,7 @@ exclude = '''
 profile = "black"
 multi_line_output = 3
 line_length = 88
-known_first_party = ["mcp_scaffolding"]
+known_first_party = ["web_search_mcp"]
 
 [tool.mypy]
 python_version = "3.10"
