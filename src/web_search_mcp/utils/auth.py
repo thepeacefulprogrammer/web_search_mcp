@@ -1,5 +1,5 @@
 """
-Authentication utilities for MCP Scaffolding
+Authentication utilities for Web Search MCP Server
 """
 
 import logging

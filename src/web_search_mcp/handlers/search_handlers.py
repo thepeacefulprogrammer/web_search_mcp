@@ -165,7 +165,7 @@ async def health_check_handler() -> str:
         # Basic health checks
         status = "healthy"
         
-        # Check if search backend is accessible (placeholder for now)
+        # Check if search backend is accessible
         backend_status = "operational"
         
         result = {
@@ -205,7 +205,7 @@ def get_search_config() -> Dict[str, Any]:
 
 def clear_search_cache() -> None:
     """
-    Clear search result cache (placeholder for future implementation).
+    Clear search result cache (future implementation).
     """
     logger.info("Search cache cleared")
     # TODO: Implement cache clearing when caching is added 

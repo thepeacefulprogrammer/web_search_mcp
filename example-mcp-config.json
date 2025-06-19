@@ -1,5 +1,5 @@
 {
-  "_comment": "Example MCP configuration for AI clients",
+  "_comment": "Example MCP configuration for Web Search MCP Server",
   "_usage": "Add this configuration to your MCP client's config file",
   "_clients": {
     "claude_desktop": "~/Library/Application Support/Claude/mcp.json (macOS) or ~/.config/claude/mcp.json (Linux) or %APPDATA%/Claude/mcp.json (Windows)",
@@ -7,10 +7,12 @@
     "custom": "Check your MCP client's documentation for config file location"
   },
   "mcpServers": {
-    "mcp-scaffolding": {
-      "command": "mcp-scaffolding-server",
+    "web-search-mcp": {
+      "command": "web-search-mcp-server",
       "args": [],
-      "env": {}
+      "env": {
+        "WEB_SEARCH_CONFIG": "./config/config.yaml"
+      }
     }
   }
 } 

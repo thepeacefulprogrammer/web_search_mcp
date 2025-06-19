@@ -1,8 +1,8 @@
 """
-DuckDuckGo search implementation (placeholder)
+DuckDuckGo search implementation (Phase 3)
 
 This module will contain the actual DuckDuckGo search functionality.
-Currently a placeholder for testing the handlers.
+Currently returns mock data for testing the handlers.
 """
 
 import asyncio
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 async def search(query: str, max_results: int = 10) -> List[Dict[str, Any]]:
     """
-    Placeholder search function for DuckDuckGo.
+    Mock search function for DuckDuckGo (Phase 3 implementation pending).
     
     Args:
         query: Search query string
@@ -23,17 +23,17 @@ async def search(query: str, max_results: int = 10) -> List[Dict[str, Any]]:
     Returns:
         List of search result dictionaries
     """
-    logger.info(f"DuckDuckGo search placeholder: query='{query}', max_results={max_results}")
+    logger.info(f"DuckDuckGo search mock: query='{query}', max_results={max_results}")
     
     # TODO: Implement actual DuckDuckGo search in Phase 3
-    # For now, return placeholder results
-    placeholder_results = [
+    # For now, return mock results for testing
+    mock_results = [
         {
-            "title": f"Placeholder result for: {query}",
-            "url": "https://example.com/placeholder",
-            "description": f"This is a placeholder search result for the query: {query}",
-            "snippet": f"Placeholder snippet containing information about {query}...",
+            "title": f"Mock result for: {query}",
+            "url": "https://example.com/mock",
+            "description": f"This is a mock search result for the query: {query}",
+            "snippet": f"Mock snippet containing information about {query}...",
         }
     ]
     
-    return placeholder_results[:max_results] 
+    return mock_results[:max_results] 

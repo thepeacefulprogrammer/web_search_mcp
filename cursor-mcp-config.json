@@ -1,1 +1,13 @@
- 
+{
+  "_comment": "Cursor MCP configuration for Web Search MCP Server",
+  "_usage": "Configuration for Cursor IDE to use Web Search MCP Server",
+  "mcpServers": {
+    "web-search-mcp": {
+      "command": "web-search-mcp-server",
+      "args": ["--config", "./config/config.yaml"],
+      "env": {
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+} 

@@ -1,5 +1,5 @@
 """
-Utility modules for MCP Scaffolding
+Utility modules for Web Search MCP Server
 """
 
 from .auth import load_auth_config

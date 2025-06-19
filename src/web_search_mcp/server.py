@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-MCP Scaffolding Server using FastMCP
+Web Search MCP Server using FastMCP
 
-This is a template FastMCP server implementation that follows modern Python
-best practices and provides a solid foundation for building MCP servers.
+This is a web search MCP server implementation that provides web search
+capabilities to AI assistants through the Model Context Protocol (MCP).
 """
 
 import argparse
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 # Log startup information
 logger.info("=" * 60)
-logger.info("MCP SCAFFOLDING SERVER STARTUP")
+logger.info("WEB SEARCH MCP SERVER STARTUP")
 logger.info("=" * 60)
 logger.info(f"Python executable: {sys.executable}")
 logger.info(f"Python version: {sys.version}")
@@ -152,7 +152,7 @@ class WebSearchMCPServer:
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
-        logger.info("MCPScaffoldingServer initialization complete")
+        logger.info("WebSearchMCPServer initialization complete")
 
     def _setup_logging(self):
         """Setup logging based on configuration."""

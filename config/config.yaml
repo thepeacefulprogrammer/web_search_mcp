@@ -1,8 +1,8 @@
 server:
-  name: "mcp-scaffolding-server"
+  name: "web-search-mcp-server"
   host: "localhost"
   port: 8000
-  description: "MCP Scaffolding Server - A template for building MCP servers"
+  description: "Web Search MCP Server - Provides web search capabilities to AI assistants"
 
 logging:
   level: "INFO"
@@ -12,51 +12,54 @@ logging:
 
 features:
   enable_auth: false
-  enable_caching: false
+  enable_caching: true
   enable_metrics: false
   enable_cors: true
 
+# Search-specific configuration
+search:
+  backend: "duckduckgo"
+  max_results: 20
+  timeout: 15
+  user_agent_rotation: true
+  content_extraction: true
+  result_filtering: true
+
 # Application-specific configuration
 application:
-  example_setting: "example_value"
-  max_concurrent_requests: 10
+  max_concurrent_searches: 5
+  search_timeout: 30
   request_timeout: 30
   
   # Data limits
   max_tools: 1000
   max_data_items: 5000
   
-  # Categories for tools
+  # Categories for search tools
   allowed_categories:
-    - "general"
-    - "demo" 
-    - "example"
+    - "search"
+    - "web"
+    - "information"
+    - "research"
     - "utility"
-    - "analysis"
   
   # Default values
   defaults:
-    tool_category: "general"
+    tool_category: "search"
     data_limit: 10
     request_timeout: 30
 
-# External services configuration (add your service configs here)
+# External services configuration
 external_services:
-  # Example service configuration
-  # api_service:
-  #   base_url: "https://api.example.com"
-  #   timeout: 30
-  #   retries: 3
-  #   api_key_env_var: "API_SERVICE_KEY"
+  # DuckDuckGo configuration (no API key required)
+  duckduckgo:
+    base_url: "https://duckduckgo.com"
+    timeout: 15
+    retries: 3
+    safe_search: "moderate"
   
-# Database configuration (if needed)
-# database:
-#   type: "sqlite"
-#   path: "./data/database.db"
-#   connection_pool_size: 5
-
-# Cache configuration (if enabled)
-# cache:
-#   type: "memory"
-#   max_size: 1000
-#   ttl: 3600
+# Cache configuration (enabled for search results)
+cache:
+  type: "memory"
+  max_size: 1000
+  ttl: 3600  # 1 hour cache for search results

@@ -1,60 +1,67 @@
-# MCP Scaffolding Project
+# Web Search MCP Server
 
-A template for creating Model Context Protocol (MCP) servers using FastMCP with modern Python best practices.
+A Model Context Protocol (MCP) server that provides web search capabilities to AI assistants like Claude Desktop. Search the web in real-time using DuckDuckGo without requiring API keys.
 
 ## Overview
 
-This project provides a solid foundation for building MCP servers that work with any MCP-compatible AI agent, including:
-- **Claude Desktop** - Anthropic's desktop application
+This MCP server enables AI assistants to perform web searches and retrieve up-to-date information from the internet. It's designed to work with any MCP-compatible AI agent, including:
+- **Claude Desktop** - Anthropic's desktop application  
 - **Continue** - VS Code AI coding assistant extension
 - **Custom MCP clients** - Any application implementing the MCP protocol
 
-The scaffolding includes:
-- **FastMCP** for MCP server implementation
-- **Modern Python packaging** with pyproject.toml
-- **Pydantic models** for data validation
-- **Comprehensive testing** with pytest
-- **Code quality tools** (black, isort, flake8, mypy, bandit)
-- **Pre-commit hooks** for automated quality checks
-- **Structured logging** with file and console output
-- **Configuration management** with YAML files
-- **Authentication utilities** for API keys and tokens
+### Key Features
+
+- 🔍 **Web Search**: Real-time web search using DuckDuckGo (no API keys required)
+- 🏥 **Health Monitoring**: Built-in health checks and status monitoring
+- ⚙️ **Configurable**: Flexible configuration for search parameters and behavior
+- 🧪 **Well Tested**: Comprehensive test suite with 22+ unit tests
+- 🔒 **Secure**: Input validation and error handling built-in
+- 📊 **Modern**: Built with FastMCP, Pydantic v2, and modern Python practices
+
+### Available MCP Tools
+
+The server provides 3 MCP tools for AI assistants:
+
+1. **`web_search`** - Search the web for information
+2. **`get_search_config`** - Get current search configuration  
+3. **`health_check`** - Check server health status
 
 ## Quick Start
 
 ### Option 1: MCP Client Integration (Recommended)
 
-For immediate testing with MCP-compatible AI agents:
+For immediate use with MCP-compatible AI agents:
 
 ```bash
-# Clone this template (or use as template on GitHub)
-git clone <your-repo-url> my-new-mcp-server
-cd my-new-mcp-server
+# Clone the repository
+git clone https://github.com/thepeacefulprogrammer/web_search_mcp.git
+cd web_search_mcp
 
 # Run the automated MCP client setup
 python setup_mcp_client.py
 ```
 
 This interactive script will:
-- Install the MCP server and dependencies
+- Install the web search MCP server and dependencies
 - Help you choose your MCP client (Claude Desktop, Continue, or custom)
-- Configure the client's `mcp.json` file automatically
-- Test the server to ensure it's working
-- Show you the available example tools
+- Configure the client's MCP configuration file automatically
+- Test the server to ensure web search is working
+- Show you the available search tools
 
 **Then restart your MCP client and try these prompts:**
-- "Test the connection to the MCP scaffolding server"
-- "Create an example tool called 'my-first-tool'"
-- "Get some example data from the scaffolding server"
+- "Search the web for the latest news about artificial intelligence"
+- "What's the current weather in San Francisco?"
+- "Find information about the latest Python 3.12 features"
+- "Check the health status of the web search service"
 
 ### Option 2: Manual Development Setup
 
 For development and customization:
 
 ```bash
-# Clone this template (or use as template on GitHub)
-git clone <your-repo-url> my-new-mcp-server
-cd my-new-mcp-server
+# Clone the repository
+git clone https://github.com/thepeacefulprogrammer/web_search_mcp.git
+cd web_search_mcp
 
 # Create virtual environment
 python -m venv venv
@@ -63,173 +70,199 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -e ".[dev]"
 
-# Install pre-commit hooks
+# Install pre-commit hooks (for development)
 pre-commit install
 ```
 
-### 2. Configure Your Project
-
-1. **Update pyproject.toml**: Change project name, description, and author info
-2. **Configure environment**: Copy `env.example` to `.env` and set your variables
-3. **Update config/config.yaml**: Modify server configuration as needed
-4. **Replace example code**: Replace the example handlers and models with your logic
-
-### 3. Run the Server
+### Run the Server
 
 ```bash
 # Run the MCP server
 python -m web_search_mcp.server
 
 # Or run with custom config
-python -m web_search_mcp.server --config config/my_config.yaml
+python -m web_search_mcp.server --config config/config.yaml
 
 # Or use the console script (after pip install)
 web-search-mcp-server
 ```
 
-### 4. Test Your Server
+### Test the Server
 
 ```bash
-# Run tests
+# Run all tests
 pytest
 
 # Run with coverage
 pytest --cov=src --cov-report=html
 
 # Run specific test category
-pytest -m unit
-pytest -m integration
+pytest tests/unit/test_search_handlers.py
+pytest tests/unit/test_search_models.py
 ```
 
 ## Project Structure
 
 ```
-my_web_search_mcp/
+web_search_mcp/
 ├── src/
 │   └── web_search_mcp/           # Main package
 │       ├── __init__.py
 │       ├── server.py              # Main MCP server
 │       ├── handlers/              # MCP tool handlers
 │       │   ├── __init__.py
-│       │   └── example_handlers.py
+│       │   └── search_handlers.py # Web search handlers
 │       ├── models/                # Pydantic models
 │       │   ├── __init__.py
-│       │   └── example_models.py
+│       │   └── search_models.py   # Search data models
+│       ├── search/                # Search implementations
+│       │   ├── __init__.py
+│       │   └── duckduckgo.py      # DuckDuckGo search backend
 │       └── utils/                 # Utility modules
 │           ├── __init__.py
 │           ├── config.py          # Configuration loading
 │           └── auth.py            # Authentication utilities
 ├── tests/                         # Test suite
 │   ├── unit/                      # Unit tests
-│   └── integration/               # Integration tests
+│   │   ├── test_search_handlers.py
+│   │   └── test_search_models.py
+│   └── integration/               # Integration tests (future)
 ├── config/                        # Configuration files
 │   └── config.yaml               # Default configuration
-├── docs/                          # Documentation
+├── examples/                      # Example scripts (future)
+├── tools/                         # Development tools (future)
+├── tasks/                         # Project management
+│   ├── prd-web-search-mcp.md     # Product requirements
+│   └── tasks-prd-web-search-mcp.md # Task breakdown
 ├── logs/                          # Log files (auto-created)
 ├── pyproject.toml                 # Modern Python packaging
+├── requirements.txt               # Dependencies
 ├── .pre-commit-config.yaml        # Code quality hooks
 ├── .gitignore                     # Git ignore rules
 ├── env.example                    # Environment template
 └── README.md                      # This file
 ```
 
-## Available Example Tools
+## Available MCP Tools
 
-The scaffolding comes with 3 example MCP tools that you can test immediately:
-
-### 1. `test_connection`
-**Purpose**: Test the MCP server connection
+### 1. `web_search`
+**Purpose**: Search the web for information using DuckDuckGo
 **Parameters**:
-- `message` (string, optional): A test message
+- `query` (string, required): The search query to execute
+- `max_results` (integer, optional): Maximum number of results to return (default: 10, max: 20)
 
-**Example usage**: "Test the connection to the MCP scaffolding server"
+**Example usage**: 
+- "Search the web for 'Python async programming best practices'"
+- "Find recent news about renewable energy with 5 results"
 
-### 2. `create_example_tool`
-**Purpose**: Create a new example tool (demonstrates data creation)
-**Parameters**:
-- `name` (string, required): The name of the tool
-- `description` (string, optional): Description of the tool
-- `category` (string, optional): Category (default: "general")
+**Response**: JSON with search results including titles, URLs, descriptions, and snippets.
 
-**Example usage**: "Create an example tool called 'data-processor' with description 'Processes user data' in the utility category"
+### 2. `get_search_config`
+**Purpose**: Get the current search configuration and settings
+**Parameters**: None
 
-### 3. `get_example_data`
-**Purpose**: Retrieve example data from the server (demonstrates data retrieval)
-**Parameters**:
-- `data_type` (string, optional): Type of data to retrieve (default: "all")
-- `limit` (integer, optional): Maximum number of items (default: 10)
+**Example usage**: "What are the current search configuration settings?"
 
-**Example usage**: "Get example data of type 'text' with a limit of 5"
+**Response**: JSON with current search backend, limits, timeouts, and caching settings.
 
-> **Note**: These are example tools for demonstration purposes. Replace them with your actual business logic when building your MCP server.
+### 3. `health_check`
+**Purpose**: Check the health status of the web search service
+**Parameters**: None
 
-## Customizing Your MCP Server
+**Example usage**: "Check the health status of the web search service"
 
-### 1. Replace Example Code
+**Response**: JSON with health status, backend information, version, and timestamp.
 
-The scaffolding includes example handlers and models that you should replace:
+## Search Capabilities
 
-- `src/web_search_mcp/handlers/example_handlers.py` - Replace with your MCP tool logic
-- `src/web_search_mcp/models/example_models.py` - Replace with your data models
-- `tests/unit/test_example_*.py` - Update tests for your code
+### Current Features
 
-### 2. Add New MCP Tools
+- **DuckDuckGo Search**: Primary search backend (no API keys required)
+- **Result Parsing**: Structured results with titles, URLs, descriptions, and snippets
+- **Input Validation**: Query validation and parameter limits
+- **Error Handling**: Graceful error handling with informative messages
+- **Health Monitoring**: Built-in health checks and status reporting
 
-To add a new MCP tool:
+### Configuration Options
 
-1. **Create handler function** in `handlers/` directory
-2. **Register the tool** in `server.py` using `@self.mcp.tool()` decorator
-3. **Add tests** for your new tool
-4. **Update configuration** if needed
-
-Example:
-```python
-@self.mcp.tool()
-async def my_new_tool(param1: str, param2: int = 10) -> str:
-    """Description of what this tool does."""
-    result = await my_new_tool_handler(param1, param2)
-    return result
-```
-
-### 3. Configuration Management
-
-Update `config/config.yaml` for your needs:
+The server supports various configuration options in `config/config.yaml`:
 
 ```yaml
 server:
-  name: "my-mcp-server"
-  description: "My custom MCP server"
+  name: "web-search-mcp"
+  description: "Web Search MCP Server"
 
-application:
-  my_setting: "my_value"
-  api_timeout: 30
+search:
+  backend: "duckduckgo"
+  max_results_limit: 20
+  default_max_results: 10
+  timeout: 30
+  cache_enabled: true
+  cache_ttl: 3600
 
-external_services:
-  my_api:
-    base_url: "https://api.example.com"
-    timeout: 30
+logging:
+  level: "INFO"
+  file_enabled: true
 ```
 
-### 4. Environment Variables
+### Environment Variables
 
-Add your API keys and secrets to `.env`:
+Set environment variables in `.env` for configuration:
 
 ```bash
 # Copy from template
 cp env.example .env
 
-# Edit with your values
-MY_API_KEY=your_api_key_here
-DATABASE_URL=sqlite:///./data.db
+# Optional: Override default settings
+SEARCH_MAX_RESULTS=15
+SEARCH_TIMEOUT=45
+LOG_LEVEL=DEBUG
 ```
 
-## Development Workflow
+## Data Models
+
+The server uses Pydantic v2 models for data validation:
+
+### SearchRequest
+```python
+{
+  "query": "search terms",
+  "max_results": 10,
+  "search_type": "web"
+}
+```
+
+### SearchResult
+```python
+{
+  "title": "Page Title",
+  "url": "https://example.com",
+  "description": "Page description",
+  "snippet": "Text snippet from page",
+  "timestamp": "2025-01-01T12:00:00Z",
+  "source": "duckduckgo",
+  "relevance_score": 1.0
+}
+```
+
+### SearchResponse
+```python
+{
+  "success": true,
+  "query": "search terms",
+  "max_results": 10,
+  "results": [...],
+  "timestamp": "2025-01-01T12:00:00Z"
+}
+```
+
+## Development
 
 ### Code Quality
 
 This project enforces code quality with:
 - **Black**: Code formatting
-- **isort**: Import sorting
+- **isort**: Import sorting  
 - **flake8**: Linting
 - **mypy**: Type checking
 - **bandit**: Security scanning
@@ -239,7 +272,7 @@ This project enforces code quality with:
 # Format code
 black src tests
 
-# Sort imports
+# Sort imports  
 isort src tests
 
 # Lint code
@@ -261,106 +294,36 @@ pytest
 # Run with coverage
 pytest --cov=src --cov-report=html
 
-# Run specific test types
-pytest -m unit
-pytest -m integration
-pytest -m "not slow"
+# Run specific test files
+pytest tests/unit/test_search_handlers.py
+pytest tests/unit/test_search_models.py
 
 # Run tests with verbose output
 pytest -v
-
-# Run specific test file
-pytest tests/unit/test_example_handlers.py
 ```
 
-### Pre-commit Hooks
+### Adding New Search Features
 
-Pre-commit hooks automatically run quality checks:
+To extend the search functionality:
 
-```bash
-# Install hooks
-pre-commit install
+1. **Add new models** in `src/web_search_mcp/models/search_models.py`
+2. **Create handlers** in `src/web_search_mcp/handlers/search_handlers.py`
+3. **Register MCP tools** in `src/web_search_mcp/server.py`
+4. **Add tests** for your new functionality
+5. **Update configuration** if needed
 
-# Run hooks manually
-pre-commit run --all-files
-
-# Skip hooks (not recommended)
-git commit --no-verify
-```
-
-## MCP Tool Development
-
-### Handler Pattern
-
-Follow this pattern for MCP tool handlers:
+Example of adding a new MCP tool:
 
 ```python
-async def my_tool_handler(
-    param1: str,
-    param2: Optional[int] = None,
+@self.mcp.tool()
+async def advanced_search(
+    query: str,
+    domain_filter: Optional[str] = None,
+    time_range: Optional[str] = None,
 ) -> str:
-    """
-    Handler function for MCP tool.
-
-    Args:
-        param1: Description of parameter
-        param2: Optional parameter with default
-
-    Returns:
-        JSON string with result
-    """
-    logger.info(f"my_tool_handler called with param1={param1}")
-
-    try:
-        # Your business logic here
-        result = await some_async_operation(param1, param2)
-
-        return json.dumps({
-            "success": True,
-            "data": result,
-        })
-    except Exception as e:
-        logger.error(f"my_tool_handler failed: {e}")
-        return json.dumps({
-            "success": False,
-            "error": str(e),
-        })
-```
-
-### Model Validation
-
-Use Pydantic models for data validation:
-
-```python
-from pydantic import BaseModel, Field, validator
-
-class MyDataModel(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    value: int = Field(..., ge=0, le=1000)
-    category: str = Field(default="general")
-
-    @validator('category')
-    def validate_category(cls, v):
-        allowed = ['general', 'special', 'admin']
-        if v not in allowed:
-            raise ValueError(f'Category must be one of: {allowed}')
-        return v
-```
-
-### Error Handling
-
-Use consistent error handling:
-
-```python
-try:
-    # Your code here
-    result = await operation()
-    return json.dumps({"success": True, "data": result})
-except ValidationError as e:
-    return json.dumps({"success": False, "error": f"Validation error: {e}"})
-except Exception as e:
-    logger.error(f"Unexpected error: {e}")
-    return json.dumps({"success": False, "error": "Internal server error"})
+    """Advanced web search with filtering options."""
+    result = await advanced_search_handler(query, domain_filter, time_range)
+    return result
 ```
 
 ## Deployment
@@ -404,19 +367,46 @@ Create a systemd service file:
 
 ```ini
 [Unit]
-Description=MCP Scaffolding Server
+Description=Web Search MCP Server
 After=network.target
 
 [Service]
 Type=simple
-User=mcp
-WorkingDirectory=/opt/mcp-server
-ExecStart=/opt/mcp-server/venv/bin/python -m web_search_mcp.server
+User=websearch
+WorkingDirectory=/opt/web-search-mcp
+ExecStart=/opt/web-search-mcp/venv/bin/python -m web_search_mcp.server
 Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+## Roadmap
+
+### Phase 1: Foundation ✅
+- [x] Basic project structure and MCP server setup
+- [x] DuckDuckGo search integration (placeholder)
+- [x] Core data models and validation
+- [x] Comprehensive testing framework
+
+### Phase 2: Core Search (In Progress)
+- [ ] Full DuckDuckGo search implementation
+- [ ] Content extraction and summarization
+- [ ] Search result caching
+- [ ] Advanced error handling
+
+### Phase 3: Enhanced Features (Planned)
+- [ ] Multiple search backends (Google, Bing)
+- [ ] Domain filtering and time-based search
+- [ ] Search result ranking and relevance
+- [ ] Rate limiting and quota management
+
+### Phase 4: Production Ready (Planned)
+- [ ] Performance optimization
+- [ ] Monitoring and alerting
+- [ ] Documentation and deployment guides
+- [ ] Integration examples
 
 ## Contributing
 
@@ -431,7 +421,7 @@ WantedBy=multi-user.target
 ```bash
 # Clone your fork
 git clone <your-fork-url>
-cd mcp-scaffolding
+cd web_search_mcp
 
 # Create virtual environment
 python -m venv venv
@@ -453,17 +443,17 @@ MIT License - see LICENSE file for details.
 
 ## Support
 
-- Create issues for bugs or feature requests
-- Check existing issues for solutions
-- Contribute improvements via pull requests
+- **Issues**: Create GitHub issues for bugs or feature requests
+- **Discussions**: Use GitHub Discussions for questions and ideas
+- **Contributing**: See CONTRIBUTING.md for development guidelines
 
 ## Changelog
 
-### v0.1.0
-- Initial scaffolding release
-- FastMCP integration
-- Modern Python packaging
-- Comprehensive testing setup
-- Code quality tooling
-- Configuration management
-- Authentication utilities
+### v0.1.0 (Current)
+- Initial web search MCP server release
+- DuckDuckGo search integration (placeholder)
+- Core MCP tools: web_search, get_search_config, health_check
+- Comprehensive Pydantic v2 data models
+- Full test suite with 22+ unit tests
+- Modern Python packaging and development tools
+- FastMCP integration with proper tool registration

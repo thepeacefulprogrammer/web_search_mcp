@@ -1,5 +1,5 @@
 """
-Configuration utilities for MCP Scaffolding
+Configuration utilities for Web Search MCP Server
 """
 
 import logging
@@ -67,7 +67,7 @@ def _default_config() -> Dict[str, Any]:
     """Default configuration if file not found."""
     return {
         "server": {
-            "name": "mcp-scaffolding-server",
+            "name": "web-search-mcp-server",
             "host": "localhost",
             "port": 8000,
         },
