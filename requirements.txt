@@ -1,0 +1,24 @@
+# Core MCP and FastMCP dependencies
+mcp>=1.0.0
+fastmcp>=0.1.0
+
+# Data validation and serialization
+pydantic>=2.0.0
+
+# Environment and configuration
+python-dotenv>=1.1.0
+
+# Command line interface
+click>=8.0.0
+
+# HTTP client for external API calls
+httpx>=0.25.0
+
+# Async utilities
+asyncio-tools>=0.3.0
+
+# Type hints for older Python versions
+typing-extensions>=4.8.0
+
+# YAML configuration support (optional)
+PyYAML>=6.0.0 

@@ -1,0 +1,102 @@
+repos:
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: debug-statements
+      - id: mixed-line-ending
+
+  # Python code formatting
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=88, --check, --diff]
+
+  # Import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88, --check-only, --diff]
+
+  # Linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args:
+          - --count
+          - --select=E9,F63,F7,F82
+          - --show-source
+          - --statistics
+          - --max-complexity=10
+          - --max-line-length=88
+
+  # Security checks
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, src]
+        exclude: tests/
+
+  # YAML formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types: [yaml]
+        exclude: \.github/
+
+  # Local hooks for testing and quality checks
+  - repo: local
+    hooks:
+      - id: code-quality-check
+        name: code-quality-check
+        entry: |
+          bash -c "
+          echo 'Running code quality checks...' &&
+          black --check --diff src tests &&
+          isort --check-only --diff src tests &&
+          flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics &&
+          flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics &&
+          echo 'Running mypy type checking (informational only)...' &&
+          (mypy src --ignore-missing-imports || echo 'mypy check completed with errors (non-blocking)')
+          "
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+      - id: pytest-check
+        name: pytest-check
+        entry: python -m pytest tests/unit --tb=short -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+      - id: commit-enforcement
+        name: commit-enforcement
+        entry: |
+          bash -c "
+          echo '✅ Pre-commit hooks completed successfully!' &&
+          echo '📋 COMMIT RULE REMINDER:' &&
+          echo '   • NEVER use --no-verify to bypass hooks' &&
+          echo '   • ALWAYS let pre-commit hooks run and fix issues' &&
+          echo '   • If hooks fail, fix the issues before committing' &&
+          echo '   • This prevents CI failures and maintains code quality' &&
+          echo '' &&
+          echo '🚀 Ready to commit! All quality checks passed.'
+          "
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true 

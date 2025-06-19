@@ -1,0 +1,16 @@
+{
+  "_comment": "Example MCP configuration for AI clients",
+  "_usage": "Add this configuration to your MCP client's config file",
+  "_clients": {
+    "claude_desktop": "~/Library/Application Support/Claude/mcp.json (macOS) or ~/.config/claude/mcp.json (Linux) or %APPDATA%/Claude/mcp.json (Windows)",
+    "continue": "~/.continue/config.json",
+    "custom": "Check your MCP client's documentation for config file location"
+  },
+  "mcpServers": {
+    "mcp-scaffolding": {
+      "command": "mcp-scaffolding-server",
+      "args": [],
+      "env": {}
+    }
+  }
+} 

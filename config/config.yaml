@@ -1,0 +1,62 @@
+server:
+  name: "mcp-scaffolding-server"
+  host: "localhost"
+  port: 8000
+  description: "MCP Scaffolding Server - A template for building MCP servers"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_enabled: true
+  console_enabled: true
+
+features:
+  enable_auth: false
+  enable_caching: false
+  enable_metrics: false
+  enable_cors: true
+
+# Application-specific configuration
+application:
+  example_setting: "example_value"
+  max_concurrent_requests: 10
+  request_timeout: 30
+  
+  # Data limits
+  max_tools: 1000
+  max_data_items: 5000
+  
+  # Categories for tools
+  allowed_categories:
+    - "general"
+    - "demo" 
+    - "example"
+    - "utility"
+    - "analysis"
+  
+  # Default values
+  defaults:
+    tool_category: "general"
+    data_limit: 10
+    request_timeout: 30
+
+# External services configuration (add your service configs here)
+external_services:
+  # Example service configuration
+  # api_service:
+  #   base_url: "https://api.example.com"
+  #   timeout: 30
+  #   retries: 3
+  #   api_key_env_var: "API_SERVICE_KEY"
+  
+# Database configuration (if needed)
+# database:
+#   type: "sqlite"
+#   path: "./data/database.db"
+#   connection_pool_size: 5
+
+# Cache configuration (if enabled)
+# cache:
+#   type: "memory"
+#   max_size: 1000
+#   ttl: 3600
