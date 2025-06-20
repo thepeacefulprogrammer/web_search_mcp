@@ -1,14 +1,20 @@
 ## Relevant Files
 
 - `src/web_search_mcp/__init__.py` - Main package initialization file for the web search MCP server
-- `src/web_search_mcp/server.py` - Core MCP server implementation with tool registration
+- `src/web_search_mcp/server.py` - Core MCP server implementation with tool registration and enhanced error handling
 - `src/web_search_mcp/models/search_models.py` - Data models for search requests and results
 - `src/web_search_mcp/handlers/search_handlers.py` - Search tool handlers and business logic
 - `src/web_search_mcp/search/duckduckgo.py` - DuckDuckGo search implementation (single backend)
 - `src/web_search_mcp/utils/config.py` - Configuration management and environment variable handling
 - `src/web_search_mcp/utils/content_extractor.py` - Web content extraction and summarization
+- `src/web_search_mcp/utils/validation.py` - Comprehensive input validation utilities
+- `src/web_search_mcp/utils/error_handling.py` - Comprehensive error handling utilities with user-friendly messages
+- `src/web_search_mcp/utils/logging_config.py` - Comprehensive logging infrastructure with configurable log levels, contextual logging, structured logging, and performance monitoring
 - `config/config.yaml` - Main configuration file for search settings
 - `tests/unit/test_search_handlers.py` - Unit tests for search handlers
+- `tests/unit/test_mcp_server.py` - Unit tests for MCP server functionality
+- `tests/unit/test_input_validation.py` - Unit tests for comprehensive input validation
+- `tests/unit/test_error_handling.py` - Unit tests for comprehensive error handling and user-friendly messages
 - `tests/unit/test_duckduckgo.py` - Unit tests for DuckDuckGo search
 - `tests/unit/test_models.py` - Unit tests for data models
 - `tests/unit/test_utils.py` - Unit tests for utility modules
@@ -17,6 +23,8 @@
 - `requirements.txt` - Updated dependencies for web search functionality
 - `pyproject.toml` - Updated package configuration
 - `README.md` - Updated documentation for web search MCP server
+- `tests/unit/test_logging_infrastructure.py` - Test suite for logging infrastructure functionality
+- `tests/unit/test_config.py` - Comprehensive unit tests for configuration management system
 
 ### Notes
 
@@ -41,28 +49,30 @@
   - [x] 1.10 Clean up any remaining scaffolding references in comments and docstrings
 
 - [ ] 2.0 Core MCP Server Infrastructure
-  - [ ] 2.1 Design and implement core search data models (SearchRequest, SearchResult, SearchConfig)
-  - [ ] 2.2 Create base MCP server class with proper tool registration
-  - [ ] 2.3 Implement search tool handler with MCP schema definitions
-  - [ ] 2.4 Add comprehensive input validation for search parameters
-  - [ ] 2.5 Implement proper error handling and user-friendly error messages
-  - [ ] 2.6 Set up logging infrastructure with configurable log levels
-  - [ ] 2.7 Create configuration management system using environment variables and YAML
-  - [ ] 2.8 Implement basic health check endpoint for monitoring
-  - [ ] 2.9 Add MCP resource support for search configurations
+  - [x] 2.1 Design and implement core search data models (SearchRequest, SearchResult, SearchConfig)
+  - [x] 2.2 Create base MCP server class with proper tool registration
+  - [x] 2.3 Implement search tool handler with MCP schema definitions
+  - [x] 2.4 Add comprehensive input validation for search parameters
+  - [x] 2.5 Implement proper error handling and user-friendly error messages
+  - [x] 2.6 Set up logging infrastructure with configurable log levels
+  - [x] 2.7 Create configuration management system using environment variables and YAML
+  - [ ] 2.8 Implement MCP resource support for search configurations and recent searches
+  - [ ] 2.9 Add MCP prompts for guided search workflows and examples
 
-- [ ] 3.0 DuckDuckGo Search Implementation
+- [ ] 3.0 DuckDuckGo Search Implementation and MCP Integration
   - [ ] 3.1 Implement DuckDuckGo search functionality (no API key required)
-  - [ ] 3.2 Add result parsing and normalization for DuckDuckGo responses
-  - [ ] 3.3 Add content extraction functionality for webpage summaries
-  - [ ] 3.4 Implement basic search result caching with TTL support
-  - [ ] 3.5 Add user agent rotation to prevent blocking
+  - [ ] 3.2 Add result parsing and normalization for DuckDuckGo responses with proper MCP content types
+  - [ ] 3.3 Add content extraction functionality for webpage summaries as MCP resources
+  - [ ] 3.4 Implement search result caching with TTL support using MCP resource patterns
+  - [ ] 3.5 Add user agent rotation to prevent blocking and ensure reliable search access
 
-- [ ] 4.0 Documentation and Deployment
-  - [ ] 4.1 Create deployment configuration files and scripts
-  - [ ] 4.2 Write integration tests for end-to-end functionality
-  - [ ] 4.3 Create comprehensive API documentation
-  - [ ] 4.4 Write deployment and configuration guides
-  - [ ] 4.5 Add example usage scripts and demo applications
-  - [ ] 4.6 Implement proper error monitoring and alerting
-  - [ ] 4.7 Final quality assurance testing and bug fixes 
+- [ ] 4.0 Remote MCP Server and Production Deployment
+  - [ ] 4.1 Implement OAuth 2.1 authentication flow with PKCE for secure remote access
+  - [ ] 4.2 Add support for both Streamable HTTP (modern) and HTTP+SSE (legacy) transports
+  - [ ] 4.3 Implement session management and transport handling for stateful connections
+  - [ ] 4.4 Create deployment configuration for cloud platforms (Railway, Vercel, or Google Cloud Run)
+  - [ ] 4.5 Add comprehensive integration tests for end-to-end MCP functionality
+  - [ ] 4.6 Implement proper error monitoring and structured logging for production
+  - [ ] 4.7 Create MCP client examples and usage documentation for Claude Desktop and other clients
+  - [ ] 4.8 Add security best practices and access control implementation
+  - [ ] 4.9 Final quality assurance testing and production readiness verification 

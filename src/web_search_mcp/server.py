@@ -14,7 +14,9 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Annotated
+
+from pydantic import Field
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent.parent
@@ -156,10 +158,13 @@ class WebSearchMCPServer:
 
     def _setup_logging(self):
         """Setup logging based on configuration."""
+        from .utils.logging_config import setup_logging
+        
         log_config = self.config.get("logging", {})
-        level = getattr(logging, log_config.get("level", "INFO"))
-
-        logging.getLogger().setLevel(level)
+        
+        # Use the comprehensive logging setup
+        setup_logging(log_config)
+        
         logger.info("Web Search MCP Server logging initialized")
 
     def _init_sync_components(self):
@@ -194,9 +199,19 @@ class WebSearchMCPServer:
         logger.info("Registering MCP tools...")
 
         # Health check tool
-        @self.mcp.tool()
+        @self.mcp.tool(
+            name="health_check",
+            description="Check the health status and operational readiness of the web search service. Returns JSON with service status, backend information, and system metrics.",
+            tags={"health", "monitoring", "status"},
+            annotations={
+                "title": "Health Check",
+                "readOnlyHint": True,
+                "openWorldHint": False,
+                "idempotentHint": True
+            }
+        )
         async def health_check() -> str:
-            """Check the health status of the web search service."""
+            """Check the health status and operational readiness of the web search service."""
             logger.info("health_check called")
             await self._ensure_async_initialized()
             
@@ -205,41 +220,149 @@ class WebSearchMCPServer:
                 logger.info("health_check completed successfully")
                 return result
             except Exception as e:
-                logger.error(f"health_check failed: {e}")
-                logger.error(f"Traceback: {traceback.format_exc()}")
-                return f"❌ Error checking health: {str(e)}"
+                from .utils.error_handling import (
+                    log_error, ErrorType, create_server_error_message, 
+                    enhance_error_with_context
+                )
+                
+                # Log the error with appropriate context
+                log_error(
+                    "Health check failed",
+                    ErrorType.SERVER_ERROR,
+                    {"operation": "health_check", "error": str(e)},
+                    exception=e
+                )
+                
+                # Create user-friendly error message
+                error_message = create_server_error_message(
+                    f"Health check failed: {str(e)}",
+                    include_support_info=True
+                )
+                
+                # Enhance with context
+                enhanced_error = enhance_error_with_context(
+                    error_message,
+                    operation="health check"
+                )
+                
+                return enhanced_error
 
         # Web search tool
-        @self.mcp.tool()
+        @self.mcp.tool(
+            name="web_search",
+            description="Search the web for information using DuckDuckGo search engine. Returns JSON-formatted search results with titles, URLs, descriptions, and metadata.",
+            tags={"search", "web", "information"},
+            annotations={
+                "title": "Web Search",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+                "idempotentHint": True
+            }
+        )
         async def web_search(
-            query: str,
-            max_results: int = 10,
+            query: Annotated[str, Field(
+                description="The search query string to execute. Should be descriptive and specific for best results.",
+                min_length=1,
+                max_length=500,
+                examples=["python web scraping", "machine learning tutorials", "weather in New York"]
+            )],
+            max_results: Annotated[int, Field(
+                description="Maximum number of search results to return",
+                ge=1,
+                le=20,
+                default=10
+            )] = 10,
+            search_type: Annotated[str, Field(
+                description="Type of search to perform",
+                pattern="^(web|news|images)$",
+                default="web"
+            )] = "web",
+            time_range: Annotated[Optional[str], Field(
+                description="Time range filter for results",
+                pattern="^(day|week|month|year)$",
+                default=None
+            )] = None,
         ) -> str:
-            """Search the web for information using DuckDuckGo.
-
-            Args:
-                query: The search query to execute
-                max_results: Maximum number of results to return (default: 10, max: 20)
-            """
-            logger.info(f"web_search called with query: {query}")
+            """Search the web for information using DuckDuckGo search engine."""
+            logger.info(f"web_search called with query: {query}, max_results: {max_results}, search_type: {search_type}, time_range: {time_range}")
             await self._ensure_async_initialized()
 
             try:
+                # Perform comprehensive input validation with enhanced error handling
+                from .utils.validation import validate_search_parameters, ValidationError as CustomValidationError
+                from .utils.error_handling import (
+                    log_error, ErrorType, handle_search_error, 
+                    enhance_error_with_context, create_validation_error_message
+                )
+                
+                try:
+                    validated_params = validate_search_parameters(
+                        query=query,
+                        max_results=max_results,
+                        search_type=search_type,
+                        time_range=time_range
+                    )
+                    logger.info("Input validation passed successfully")
+                except CustomValidationError as ve:
+                    # Use enhanced error handling for validation errors
+                    log_error(
+                        f"Input validation failed for web_search",
+                        ErrorType.VALIDATION_ERROR,
+                        {"query": query, "max_results": max_results, "validation_error": ve.message}
+                    )
+                    # Return user-friendly validation error message
+                    if "query" in ve.message.lower():
+                        return create_validation_error_message("query", query, ve.message)
+                    elif "max_results" in ve.message.lower():
+                        return create_validation_error_message("max_results", max_results, ve.message)
+                    elif "search_type" in ve.message.lower():
+                        return create_validation_error_message("search_type", search_type, ve.message)
+                    elif "time_range" in ve.message.lower():
+                        return create_validation_error_message("time_range", time_range, ve.message)
+                    else:
+                        return f"❌ Invalid input: {ve.message}"
+                
                 result = await web_search_handler(
-                    query=query,
-                    max_results=max_results,
+                    query=validated_params.get('query', query),
+                    max_results=validated_params.get('max_results', max_results),
+                    search_type=validated_params.get('search_type', search_type),
+                    time_range=validated_params.get('time_range', time_range),
                 )
                 logger.info("web_search completed successfully")
                 return result
+                
             except Exception as e:
-                logger.error(f"web_search failed: {e}")
-                logger.error(f"Traceback: {traceback.format_exc()}")
-                return f"❌ Error performing web search: {str(e)}"
+                # Use comprehensive error handling
+                error_message = handle_search_error(
+                    error=e,
+                    query=query,
+                    max_results=max_results,
+                    backend="duckduckgo"
+                )
+                
+                # Enhance error with context for better user experience
+                enhanced_error = enhance_error_with_context(
+                    error_message,
+                    query=query,
+                    operation="web search"
+                )
+                
+                return enhanced_error
 
         # Search configuration tool
-        @self.mcp.tool()
+        @self.mcp.tool(
+            name="get_search_config",
+            description="Retrieve the current search configuration settings including backend, limits, timeouts, and caching options. Returns JSON with all configuration parameters.",
+            tags={"config", "settings", "administration"},
+            annotations={
+                "title": "Get Search Configuration",
+                "readOnlyHint": True,
+                "openWorldHint": False,
+                "idempotentHint": True
+            }
+        )
         async def get_search_config() -> str:
-            """Get the current search configuration and settings."""
+            """Retrieve the current search configuration settings."""
             logger.info("get_search_config called")
             await self._ensure_async_initialized()
 
@@ -248,9 +371,32 @@ class WebSearchMCPServer:
                 logger.info("get_search_config completed successfully")
                 return result
             except Exception as e:
-                logger.error(f"get_search_config failed: {e}")
-                logger.error(f"Traceback: {traceback.format_exc()}")
-                return f"❌ Error retrieving search config: {str(e)}"
+                from .utils.error_handling import (
+                    log_error, ErrorType, create_server_error_message, 
+                    enhance_error_with_context
+                )
+                
+                # Log the error with appropriate context
+                log_error(
+                    "Failed to retrieve search configuration",
+                    ErrorType.CONFIG_ERROR,
+                    {"operation": "get_search_config", "error": str(e)},
+                    exception=e
+                )
+                
+                # Create user-friendly error message
+                error_message = create_server_error_message(
+                    f"Configuration retrieval failed: {str(e)}",
+                    include_support_info=True
+                )
+                
+                # Enhance with context
+                enhanced_error = enhance_error_with_context(
+                    error_message,
+                    operation="search configuration retrieval"
+                )
+                
+                return enhanced_error
 
         logger.info("Tool registration complete")
 

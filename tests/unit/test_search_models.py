@@ -83,6 +83,41 @@ class TestSearchRequest:
         assert request.max_results == 10
         assert request.search_type == "web"
 
+    def test_search_request_time_range_validation(self):
+        """Test time_range validation."""
+        # Invalid time range should fail
+        with pytest.raises(ValidationError) as exc_info:
+            SearchRequest(query="test", time_range="invalid")
+        assert "time_range must be one of" in str(exc_info.value).lower()
+
+        # Valid time ranges should pass
+        for time_range in ["day", "week", "month", "year"]:
+            request = SearchRequest(query="test", time_range=time_range)
+            assert request.time_range == time_range
+
+    def test_search_request_domains(self):
+        """Test allowed and blocked domains."""
+        request = SearchRequest(
+            query="test",
+            allowed_domains=["example.com", "test.org"],
+            blocked_domains=["spam.com"]
+        )
+        assert request.allowed_domains == ["example.com", "test.org"]
+        assert request.blocked_domains == ["spam.com"]
+
+    def test_search_request_query_length_validation(self):
+        """Test query length validation."""
+        # Query too long should fail
+        long_query = "a" * 501
+        with pytest.raises(ValidationError) as exc_info:
+            SearchRequest(query=long_query)
+        assert "at most 500 characters" in str(exc_info.value).lower()
+
+        # Maximum length should pass
+        max_query = "a" * 500
+        request = SearchRequest(query=max_query)
+        assert request.query == max_query
+
 
 class TestSearchResult:
     """Test class for SearchResult model."""
@@ -156,6 +191,44 @@ class TestSearchResult:
             )
         assert "less than or equal to 1" in str(exc_info.value).lower()
 
+    def test_search_result_serialization(self):
+        """Test SearchResult serialization."""
+        result = SearchResult(
+            title="Test Title",
+            url="https://example.com",
+            description="Test description",
+            snippet="Test snippet",
+            source="custom",
+            relevance_score=0.8
+        )
+        
+        # Test model_dump (pydantic v2)
+        data = result.model_dump()
+        assert data["title"] == "Test Title"
+        assert str(data["url"]) == "https://example.com/"
+        assert data["description"] == "Test description"
+        assert data["snippet"] == "Test snippet"
+        assert data["source"] == "custom"
+        assert data["relevance_score"] == 0.8
+        assert isinstance(data["timestamp"], str)  # Should be serialized to ISO string
+
+    def test_search_result_custom_values(self):
+        """Test SearchResult with custom values."""
+        custom_timestamp = datetime(2023, 1, 1, 12, 0, 0)
+        result = SearchResult(
+            title="Custom Title",
+            url="https://custom.com",
+            description="Custom description",
+            snippet="Custom snippet",
+            timestamp=custom_timestamp,
+            source="custom_source",
+            relevance_score=0.5
+        )
+        
+        assert result.timestamp == custom_timestamp
+        assert result.source == "custom_source"
+        assert result.relevance_score == 0.5
+
 
 class TestSearchResponse:
     """Test class for SearchResponse model."""
@@ -199,6 +272,36 @@ class TestSearchResponse:
         assert response.error == "Search service unavailable"
         assert len(response.results) == 0
 
+    def test_search_response_with_metadata(self):
+        """Test search response with optional metadata."""
+        response = SearchResponse(
+            success=True,
+            query="test query",
+            max_results=10,
+            results=[],
+            total_results=100,
+            search_time=0.5
+        )
+        
+        assert response.total_results == 100
+        assert response.search_time == 0.5
+
+    def test_search_response_serialization(self):
+        """Test SearchResponse serialization."""
+        response = SearchResponse(
+            success=True,
+            query="test query",
+            max_results=10,
+            results=[]
+        )
+        
+        # Test model_dump
+        data = response.model_dump()
+        assert data["success"] is True
+        assert data["query"] == "test query"
+        assert data["max_results"] == 10
+        assert isinstance(data["timestamp"], str)  # Should be serialized to ISO string
+
 
 class TestSearchConfig:
     """Test class for SearchConfig model."""
@@ -239,6 +342,61 @@ class TestSearchConfig:
         assert config.cache_enabled is True
         assert config.cache_ttl == 3600
 
+    def test_search_config_validation_ranges(self):
+        """Test SearchConfig validation ranges."""
+        # Test max_results_limit bounds
+        with pytest.raises(ValidationError):
+            SearchConfig(max_results_limit=0)
+        with pytest.raises(ValidationError):
+            SearchConfig(max_results_limit=101)
+
+        # Test timeout bounds
+        with pytest.raises(ValidationError):
+            SearchConfig(timeout=4)  # Below minimum
+        with pytest.raises(ValidationError):
+            SearchConfig(timeout=121)  # Above maximum
+
+        # Test cache_ttl bounds
+        with pytest.raises(ValidationError):
+            SearchConfig(cache_ttl=59)  # Below minimum
+        with pytest.raises(ValidationError):
+            SearchConfig(cache_ttl=86401)  # Above maximum
+
+        # Test retry settings
+        with pytest.raises(ValidationError):
+            SearchConfig(retry_attempts=0)  # Below minimum
+        with pytest.raises(ValidationError):
+            SearchConfig(retry_attempts=11)  # Above maximum
+
+        with pytest.raises(ValidationError):
+            SearchConfig(retry_delay=0.05)  # Below minimum
+        with pytest.raises(ValidationError):
+            SearchConfig(retry_delay=10.1)  # Above maximum
+
+    def test_search_config_complete(self):
+        """Test SearchConfig with all fields."""
+        config = SearchConfig(
+            search_backend="google",
+            max_results_limit=50,
+            default_max_results=15,
+            timeout=60,
+            user_agent_rotation=False,
+            cache_enabled=False,
+            cache_ttl=1800,
+            retry_attempts=5,
+            retry_delay=2.0
+        )
+        
+        assert config.search_backend == "google"
+        assert config.max_results_limit == 50
+        assert config.default_max_results == 15
+        assert config.timeout == 60
+        assert config.user_agent_rotation is False
+        assert config.cache_enabled is False
+        assert config.cache_ttl == 1800
+        assert config.retry_attempts == 5
+        assert config.retry_delay == 2.0
+
 
 class TestContentExtract:
     """Test class for ContentExtract model."""
@@ -267,4 +425,55 @@ class TestContentExtract:
                 title="Test",
                 content="Test content"
             )
-        assert "valid url" in str(exc_info.value).lower() 
+        assert "valid url" in str(exc_info.value).lower()
+
+    def test_content_extract_with_metadata(self):
+        """Test ContentExtract with optional metadata."""
+        metadata = {"author": "John Doe", "publish_date": "2023-01-01"}
+        extract = ContentExtract(
+            url="https://example.com",
+            title="Test Title",
+            content="Test content",
+            word_count=150,
+            language="en",
+            metadata=metadata
+        )
+        
+        assert extract.word_count == 150
+        assert extract.language == "en"
+        assert extract.metadata == metadata
+
+    def test_content_extract_word_count_validation(self):
+        """Test word_count validation."""
+        # Negative word count should fail
+        with pytest.raises(ValidationError):
+            ContentExtract(
+                url="https://example.com",
+                title="Test",
+                content="Test",
+                word_count=-1
+            )
+
+        # Zero word count should pass
+        extract = ContentExtract(
+            url="https://example.com",
+            title="Test",
+            content="",
+            word_count=0
+        )
+        assert extract.word_count == 0
+
+    def test_content_extract_serialization(self):
+        """Test ContentExtract serialization."""
+        extract = ContentExtract(
+            url="https://example.com",
+            title="Test Title",
+            content="Test content"
+        )
+        
+        # Test model_dump
+        data = extract.model_dump()
+        assert str(data["url"]) == "https://example.com/"
+        assert data["title"] == "Test Title"
+        assert data["content"] == "Test content"
+        assert isinstance(data["extracted_at"], str)  # Should be serialized to ISO string 

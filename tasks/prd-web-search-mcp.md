@@ -64,7 +64,7 @@ The transformation involves two main phases:
 21. **F5.1** - Add rate limiting and quota management
 22. **F5.2** - Implement configuration management via environment variables
 23. **F5.3** - Add comprehensive unit and integration tests
-24. **F5.4** - Implement health checks and monitoring endpoints
+24. **F5.4** - Implement MCP-compliant authentication and security features
 25. **F5.5** - Add documentation for deployment and configuration
 
 ## Technical Architecture
@@ -81,6 +81,9 @@ The transformation involves two main phases:
 - **ContentExtractor**: Extracts and summarizes webpage content
 - **CacheManager**: Handles result caching and invalidation
 - **RateLimiter**: Manages API quotas and request limits
+- **ResourceProvider**: Exposes MCP resources for configuration and search history
+- **PromptTemplateManager**: Manages reusable MCP prompt templates
+- **SessionManager**: Handles MCP session lifecycle and state
 
 ### Data Models
 ```python
@@ -116,6 +119,14 @@ class SearchRequest:
 
 ## Technical Considerations
 
+### MCP Architecture Compliance
+- **Transport Protocols**: Support for stdio, SSE, and streamable HTTP
+- **Session Management**: Proper MCP session initialization and lifecycle
+- **Resource Management**: Implement MCP resources for configuration and search history
+- **Tool Registration**: Comprehensive MCP tool schemas with proper validation
+- **Prompt Templates**: Reusable MCP prompts for common search scenarios
+- **Error Handling**: MCP-compliant error responses and status codes
+
 ### Dependencies
 - **httpx**: Async HTTP client for API requests
 - **BeautifulSoup4**: HTML parsing for content extraction
@@ -133,6 +144,11 @@ class SearchRequest:
 ### Configuration Management
 ```yaml
 # config/config.yaml
+server:
+  name: "web-search-mcp"
+  description: "Web Search MCP Server"
+  transport: "stdio"  # stdio, sse, or streamable-http
+
 search:
   backends:
     - name: "duckduckgo"
@@ -151,6 +167,26 @@ search:
   rate_limits:
     requests_per_minute: 60
     requests_per_hour: 1000
+
+mcp:
+  resources:
+    search_config:
+      enabled: true
+      name: "search-configuration"
+      description: "Current search backend configuration"
+    search_history:
+      enabled: true
+      name: "search-history" 
+      description: "Recent search queries and results"
+      max_entries: 100
+  
+  prompts:
+    web_search:
+      name: "web-search"
+      description: "Search the web for information"
+    news_search:
+      name: "news-search"
+      description: "Search for recent news articles"
 ```
 
 ## Success Metrics
