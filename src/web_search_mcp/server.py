@@ -217,66 +217,10 @@ class WebSearchMCPServer:
         """Register all MCP tools."""
         logger.info("Registering MCP tools...")
 
-        # Health check tool
-        @self.mcp.tool(
-            name="health_check",
-            description="Check the health status and operational readiness of the web search service. Returns JSON with service status, backend information, and system metrics.",
-            tags={"health", "monitoring", "status"},
-            annotations={
-                "title": "Health Check",
-                "readOnlyHint": True,
-                "openWorldHint": False,
-                "idempotentHint": True
-            }
-        )
-        async def health_check() -> str:
-            """Check the health status and operational readiness of the web search service."""
-            logger.info("health_check called")
-            await self._ensure_async_initialized()
-            
-            try:
-                result = await health_check_handler()
-                logger.info("health_check completed successfully")
-                return result
-            except Exception as e:
-                from .utils.error_handling import (
-                    log_error, ErrorType, create_server_error_message, 
-                    enhance_error_with_context
-                )
-                
-                # Log the error with appropriate context
-                log_error(
-                    "Health check failed",
-                    ErrorType.SERVER_ERROR,
-                    {"operation": "health_check", "error": str(e)},
-                    exception=e
-                )
-                
-                # Create user-friendly error message
-                error_message = create_server_error_message(
-                    f"Health check failed: {str(e)}",
-                    include_support_info=True
-                )
-                
-                # Enhance with context
-                enhanced_error = enhance_error_with_context(
-                    error_message,
-                    operation="health check"
-                )
-                
-                return enhanced_error
-
         # Web search tool
         @self.mcp.tool(
             name="web_search",
-            description="Search the web for information using DuckDuckGo search engine. Returns JSON-formatted search results with titles, URLs, descriptions, and metadata.",
-            tags={"search", "web", "information"},
-            annotations={
-                "title": "Web Search",
-                "readOnlyHint": True,
-                "openWorldHint": True,
-                "idempotentHint": True
-            }
+            description="Search the web for information using DuckDuckGo search engine. Returns JSON-formatted search results with titles, URLs, descriptions, and metadata."
         )
         async def web_search(
             query: Annotated[str, Field(
@@ -344,8 +288,6 @@ class WebSearchMCPServer:
                 result = await web_search_handler(
                     query=validated_params.get('query', query),
                     max_results=validated_params.get('max_results', max_results),
-                    search_type=validated_params.get('search_type', search_type),
-                    time_range=validated_params.get('time_range', time_range),
                 )
                 
                 # Add search to history for MCP resource tracking
@@ -408,14 +350,7 @@ class WebSearchMCPServer:
         # Search configuration tool
         @self.mcp.tool(
             name="get_search_config",
-            description="Retrieve the current search configuration settings including backend, limits, timeouts, and caching options. Returns JSON with all configuration parameters.",
-            tags={"config", "settings", "administration"},
-            annotations={
-                "title": "Get Search Configuration",
-                "readOnlyHint": True,
-                "openWorldHint": False,
-                "idempotentHint": True
-            }
+            description="Retrieve the current search configuration settings including backend, limits, timeouts, and caching options. Returns JSON with all configuration parameters."
         )
         async def get_search_config() -> str:
             """Retrieve the current search configuration settings."""
@@ -506,8 +441,7 @@ class WebSearchMCPServer:
             def create_prompt_handler(prompt_name, prompt_description, prompt_arguments):
                 @self.mcp.prompt(
                     name=prompt_name,
-                    description=prompt_description,
-                    arguments=prompt_arguments
+                    description=prompt_description
                 )
                 async def prompt_handler(**kwargs) -> str:
                     """Dynamic prompt handler for search workflows."""

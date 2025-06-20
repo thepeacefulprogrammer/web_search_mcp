@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "web-search-mcp": {
+      "command": "python",
+      "args": [
+        "-m",
+        "src.web_search_mcp.server"
+      ],
+      "cwd": "/home/randy/workspace/personal/web_search_mcp",
+      "env": {
+        "PYTHONPATH": "/home/randy/workspace/personal/web_search_mcp",
+        "PYTHONUNBUFFERED": "1",
+        "LOG_LEVEL": "INFO"
+      },
+      "disabled": false
+    }
+  },
+  "globalSettings": {
+    "timeout": 30000,
+    "retries": 3,
+    "logLevel": "info"
+  }
+} 

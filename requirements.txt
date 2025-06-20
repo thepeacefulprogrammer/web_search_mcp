@@ -25,4 +25,12 @@ asyncio-tools>=0.3.0
 typing-extensions>=4.8.0
 
 # YAML configuration support (optional)
-PyYAML>=6.0.0 
+PyYAML>=6.0.0
+
+# OAuth 2.1 and security dependencies
+cryptography>=41.0.0
+PyJWT>=2.8.0
+
+# HTTP server for OAuth callbacks
+uvicorn>=0.23.0
+fastapi>=0.104.0

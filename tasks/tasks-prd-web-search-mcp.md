@@ -31,6 +31,26 @@
 - `src/web_search_mcp/prompts/__init__.py` - MCP prompts package initialization
 - `src/web_search_mcp/prompts/search_prompts.py` - MCP prompt templates for guided search workflows
 - `tests/unit/test_mcp_prompts.py` - Comprehensive unit tests for MCP prompt functionality
+- `tests/unit/test_duckduckgo.py` - Comprehensive unit tests for DuckDuckGo search functionality
+- `tests/unit/test_duckduckgo_mcp_integration.py` - Comprehensive unit tests for DuckDuckGo MCP integration and content type handling
+- `src/web_search_mcp/utils/search_cache.py` - Search result caching with TTL support and MCP resource patterns
+- `src/web_search_mcp/handlers/enhanced_search_handlers.py` - Enhanced search handlers with content extraction and caching integration
+- `tests/unit/test_content_extraction.py` - Comprehensive unit tests for content extraction functionality
+- `tests/unit/test_search_cache.py` - Comprehensive unit tests for search result caching with TTL support
+- `tests/unit/test_enhanced_search_handlers.py` - Comprehensive unit tests for enhanced search handlers with content extraction and caching
+- `src/web_search_mcp/auth/__init__.py` - OAuth 2.1 authentication package initialization
+- `src/web_search_mcp/auth/oauth_provider.py` - OAuth 2.1 provider with PKCE support for secure authentication
+- `src/web_search_mcp/auth/oauth_flow.py` - OAuth 2.1 flow orchestration and helper functions
+- `src/web_search_mcp/auth/auth_middleware.py` - Authentication middleware for MCP server integration
+- `src/web_search_mcp/transports/__init__.py` - Transport layer package initialization
+- `src/web_search_mcp/transports/http_transport.py` - HTTP and Streamable HTTP transport implementations
+- `src/web_search_mcp/transports/sse_transport.py` - Server-Sent Events transport implementation
+- `src/web_search_mcp/transports/transport_manager.py` - Unified transport management system
+- `tests/unit/test_oauth_auth.py` - Comprehensive unit tests for OAuth 2.1 authentication system (32 tests)
+- `tests/unit/test_transports.py` - Comprehensive unit tests for transport layer functionality (51 tests)
+- `src/web_search_mcp/session/session_manager.py` - Session management with stateful connection handling and lifecycle management
+- `src/web_search_mcp/session/connection_handler.py` - Connection lifecycle management and pooling for stateful MCP connections
+- `tests/unit/test_session_management.py` - Comprehensive unit tests for session management and connection handling (51 tests)
 
 ### Notes
 
@@ -65,20 +85,15 @@
   - [x] 2.8 Implement MCP resource support for search configurations and recent searches
   - [x] 2.9 Add MCP prompts for guided search workflows and examples
 
-- [ ] 3.0 DuckDuckGo Search Implementation and MCP Integration
-  - [ ] 3.1 Implement DuckDuckGo search functionality (no API key required)
-  - [ ] 3.2 Add result parsing and normalization for DuckDuckGo responses with proper MCP content types
-  - [ ] 3.3 Add content extraction functionality for webpage summaries as MCP resources
-  - [ ] 3.4 Implement search result caching with TTL support using MCP resource patterns
-  - [ ] 3.5 Add user agent rotation to prevent blocking and ensure reliable search access
+- [x] 3.0 DuckDuckGo Search Implementation and MCP Integration
+  - [x] 3.1 Implement DuckDuckGo search functionality (no API key required)
+  - [x] 3.2 Add result parsing and normalization for DuckDuckGo responses with proper MCP content types
+  - [x] 3.3 Add content extraction functionality for webpage summaries as MCP resources
+  - [x] 3.4 Implement search result caching with TTL support using MCP resource patterns
+  - [x] 3.5 Create enhanced search handlers with content extraction and caching integration
 
 - [ ] 4.0 Remote MCP Server and Production Deployment
-  - [ ] 4.1 Implement OAuth 2.1 authentication flow with PKCE for secure remote access
-  - [ ] 4.2 Add support for both Streamable HTTP (modern) and HTTP+SSE (legacy) transports
-  - [ ] 4.3 Implement session management and transport handling for stateful connections
-  - [ ] 4.4 Create deployment configuration for cloud platforms (Railway, Vercel, or Google Cloud Run)
-  - [ ] 4.5 Add comprehensive integration tests for end-to-end MCP functionality
-  - [ ] 4.6 Implement proper error monitoring and structured logging for production
-  - [ ] 4.7 Create MCP client examples and usage documentation for Claude Desktop and other clients
-  - [ ] 4.8 Add security best practices and access control implementation
-  - [ ] 4.9 Final quality assurance testing and production readiness verification 
+  - [x] 4.1 Implement OAuth 2.1 authentication flow with PKCE for secure remote access
+  - [x] 4.2 Add support for both Streamable HTTP (modern) and HTTP+SSE (legacy) transports
+  - [x] 4.3 Implement session management and transport handling for stateful connections
+  

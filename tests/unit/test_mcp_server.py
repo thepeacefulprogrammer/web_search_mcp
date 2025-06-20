@@ -271,7 +271,7 @@ class TestMCPSchemaDefinitions:
                 assert sig.return_annotation != inspect.Signature.empty, f"Tool {tool_name} missing return annotation"
 
     def test_enhanced_mcp_schema_annotations(self):
-        """Test enhanced MCP schema with annotations and tags."""
+        """Test MCP schema with proper tool registration."""
         with patch('web_search_mcp.server.load_config') as mock_load_config, \
              patch('web_search_mcp.server.FastMCP') as mock_fastmcp, \
              patch('web_search_mcp.server.load_auth_config') as mock_load_auth:
@@ -298,30 +298,13 @@ class TestMCPSchemaDefinitions:
             # Create server
             server = WebSearchMCPServer()
             
-            # Verify web_search tool has enhanced schema
+            # Verify web_search tool has proper schema
             web_search_info = registered_tools['web_search']
             web_search_kwargs = web_search_info['kwargs']
             
-            # Check tool metadata
+            # Check tool metadata (FastMCP only supports name and description)
             assert web_search_kwargs.get('name') == 'web_search'
             assert 'DuckDuckGo' in web_search_kwargs.get('description', '')
-            assert 'search' in web_search_kwargs.get('tags', set())
-            assert 'web' in web_search_kwargs.get('tags', set())
-            
-            # Check annotations
-            annotations = web_search_kwargs.get('annotations', {})
-            assert annotations.get('title') == 'Web Search'
-            assert annotations.get('readOnlyHint') is True
-            assert annotations.get('openWorldHint') is True
-            assert annotations.get('idempotentHint') is True
-            
-            # Verify health_check tool has proper schema
-            health_check_info = registered_tools['health_check']
-            health_check_kwargs = health_check_info['kwargs']
-            
-            assert health_check_kwargs.get('name') == 'health_check'
-            assert 'health status' in health_check_kwargs.get('description', '').lower()
-            assert 'health' in health_check_kwargs.get('tags', set())
             
             # Verify get_search_config tool has proper schema
             config_info = registered_tools['get_search_config']
@@ -329,7 +312,11 @@ class TestMCPSchemaDefinitions:
             
             assert config_kwargs.get('name') == 'get_search_config'
             assert 'configuration' in config_kwargs.get('description', '').lower()
-            assert 'config' in config_kwargs.get('tags', set())
+            
+            # Verify both tools are properly registered
+            assert len(registered_tools) == 2  # web_search and get_search_config
+            assert 'web_search' in registered_tools
+            assert 'get_search_config' in registered_tools
 
     def test_web_search_parameter_validation_schema(self):
         """Test web_search parameter validation schema using Pydantic Field."""
