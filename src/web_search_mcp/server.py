@@ -8,6 +8,7 @@ capabilities to AI assistants through the Model Context Protocol (MCP).
 
 import argparse
 import asyncio
+import json
 import logging
 import os
 import sys
@@ -151,6 +152,24 @@ class WebSearchMCPServer:
             logger.info("Tools registered successfully")
         except Exception as e:
             logger.error(f"Failed to register tools: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            raise
+
+        try:
+            # Register MCP resources
+            self._register_resources()
+            logger.info("MCP resources registered successfully")
+        except Exception as e:
+            logger.error(f"Failed to register MCP resources: {e}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            raise
+
+        try:
+            # Register MCP prompts
+            self._register_prompts()
+            logger.info("MCP prompts registered successfully")
+        except Exception as e:
+            logger.error(f"Failed to register MCP prompts: {e}")
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
 
@@ -328,6 +347,43 @@ class WebSearchMCPServer:
                     search_type=validated_params.get('search_type', search_type),
                     time_range=validated_params.get('time_range', time_range),
                 )
+                
+                # Add search to history for MCP resource tracking
+                try:
+                    from .resources.search_resources import add_search_to_history
+                    from .models.search_models import SearchResponse
+                    import json as json_module
+                    
+                    # Parse the result to extract search response data
+                    result_data = json_module.loads(result)
+                    if result_data.get("success", False):
+                        # Create a SearchResponse object for history tracking
+                        search_results = []
+                        for result_item in result_data.get("results", []):
+                            from .models.search_models import SearchResult
+                            search_result = SearchResult(
+                                title=result_item.get("title", ""),
+                                url=result_item.get("url", ""),
+                                description=result_item.get("description", ""),
+                                snippet=result_item.get("snippet", ""),
+                                source=result_item.get("source", "duckduckgo"),
+                                relevance_score=result_item.get("relevance_score", 1.0)
+                            )
+                            search_results.append(search_result)
+                        
+                        search_response = SearchResponse(
+                            success=True,
+                            query=query,
+                            max_results=max_results,
+                            results=search_results
+                        )
+                        add_search_to_history(search_response)
+                        logger.debug(f"Added search to history: {query}")
+                        
+                except Exception as history_error:
+                    # Don't fail the search if history tracking fails
+                    logger.warning(f"Failed to add search to history: {history_error}")
+                
                 logger.info("web_search completed successfully")
                 return result
                 
@@ -399,6 +455,95 @@ class WebSearchMCPServer:
                 return enhanced_error
 
         logger.info("Tool registration complete")
+
+    def _register_resources(self):
+        """Register MCP resources for search configuration and history."""
+        logger.info("Registering MCP resources...")
+
+        from .resources.search_resources import get_search_configuration, get_search_history
+
+        # Register search configuration resource
+        @self.mcp.resource("search://configuration")
+        async def search_configuration_resource() -> str:
+            """Provide current search configuration as an MCP resource."""
+            logger.info("search_configuration_resource called")
+            try:
+                return get_search_configuration()
+            except Exception as e:
+                logger.error(f"Error getting search configuration resource: {e}")
+                return json.dumps({"error": f"Failed to get search configuration: {str(e)}"})
+
+        # Register search history resource
+        @self.mcp.resource("search://history")
+        async def search_history_resource() -> str:
+            """Provide recent search history as an MCP resource."""
+            logger.info("search_history_resource called")
+            try:
+                return get_search_history()
+            except Exception as e:
+                logger.error(f"Error getting search history resource: {e}")
+                return json.dumps({"error": f"Failed to get search history: {str(e)}"})
+
+        logger.info("MCP resource registration complete")
+
+    def _register_prompts(self):
+        """Register MCP prompt templates for guided search workflows."""
+        logger.info("Registering MCP prompts...")
+        
+        from .prompts.search_prompts import list_available_prompts, validate_prompt_arguments
+        
+        # Get available prompts from the prompt provider
+        available_prompts = list_available_prompts()
+        
+        for prompt_def in available_prompts:
+            prompt_name = prompt_def["name"]
+            prompt_description = prompt_def["description"]
+            prompt_arguments = prompt_def["arguments"]
+            
+            logger.info(f"Registering prompt: {prompt_name}")
+            
+            # Create the prompt function dynamically
+            def create_prompt_handler(prompt_name, prompt_description, prompt_arguments):
+                @self.mcp.prompt(
+                    name=prompt_name,
+                    description=prompt_description,
+                    arguments=prompt_arguments
+                )
+                async def prompt_handler(**kwargs) -> str:
+                    """Dynamic prompt handler for search workflows."""
+                    from .prompts.search_prompts import _get_prompt_provider
+                    
+                    try:
+                        # Validate arguments
+                        is_valid, errors = validate_prompt_arguments(prompt_name, kwargs)
+                        if not is_valid:
+                            error_msg = f"Invalid arguments for prompt '{prompt_name}': {', '.join(errors)}"
+                            logger.error(error_msg)
+                            return f"Error: {error_msg}"
+                        
+                        # Get the prompt provider and render the prompt
+                        provider = _get_prompt_provider()
+                        rendered_prompt = provider.render_prompt(prompt_name, kwargs)
+                        
+                        if rendered_prompt is None:
+                            error_msg = f"Failed to render prompt '{prompt_name}'"
+                            logger.error(error_msg)
+                            return f"Error: {error_msg}"
+                        
+                        logger.info(f"Successfully rendered prompt '{prompt_name}' with arguments: {kwargs}")
+                        return rendered_prompt
+                        
+                    except Exception as e:
+                        error_msg = f"Error processing prompt '{prompt_name}': {str(e)}"
+                        logger.error(error_msg)
+                        return f"Error: {error_msg}"
+                
+                return prompt_handler
+            
+            # Register the prompt
+            create_prompt_handler(prompt_name, prompt_description, prompt_arguments)
+            
+        logger.info(f"Registered {len(available_prompts)} MCP prompts")
 
     def run(self):
         """Run the MCP server."""

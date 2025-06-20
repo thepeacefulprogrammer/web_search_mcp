@@ -25,6 +25,12 @@
 - `README.md` - Updated documentation for web search MCP server
 - `tests/unit/test_logging_infrastructure.py` - Test suite for logging infrastructure functionality
 - `tests/unit/test_config.py` - Comprehensive unit tests for configuration management system
+- `src/web_search_mcp/resources/__init__.py` - MCP resources package initialization
+- `src/web_search_mcp/resources/search_resources.py` - MCP resource implementation for search configuration and history
+- `tests/unit/test_mcp_resources.py` - Comprehensive unit tests for MCP resource functionality
+- `src/web_search_mcp/prompts/__init__.py` - MCP prompts package initialization
+- `src/web_search_mcp/prompts/search_prompts.py` - MCP prompt templates for guided search workflows
+- `tests/unit/test_mcp_prompts.py` - Comprehensive unit tests for MCP prompt functionality
 
 ### Notes
 
@@ -48,7 +54,7 @@
   - [x] 1.9 Update example configuration files to reflect web search functionality
   - [x] 1.10 Clean up any remaining scaffolding references in comments and docstrings
 
-- [ ] 2.0 Core MCP Server Infrastructure
+- [x] 2.0 Core MCP Server Infrastructure
   - [x] 2.1 Design and implement core search data models (SearchRequest, SearchResult, SearchConfig)
   - [x] 2.2 Create base MCP server class with proper tool registration
   - [x] 2.3 Implement search tool handler with MCP schema definitions
@@ -56,8 +62,8 @@
   - [x] 2.5 Implement proper error handling and user-friendly error messages
   - [x] 2.6 Set up logging infrastructure with configurable log levels
   - [x] 2.7 Create configuration management system using environment variables and YAML
-  - [ ] 2.8 Implement MCP resource support for search configurations and recent searches
-  - [ ] 2.9 Add MCP prompts for guided search workflows and examples
+  - [x] 2.8 Implement MCP resource support for search configurations and recent searches
+  - [x] 2.9 Add MCP prompts for guided search workflows and examples
 
 - [ ] 3.0 DuckDuckGo Search Implementation and MCP Integration
   - [ ] 3.1 Implement DuckDuckGo search functionality (no API key required)

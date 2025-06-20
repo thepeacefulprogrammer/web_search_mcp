@@ -63,3 +63,27 @@ cache:
   type: "memory"
   max_size: 1000
   ttl: 3600  # 1 hour cache for search results
+
+# MCP configuration
+mcp:
+  # Resource configuration
+  resources:
+    search_config:
+      enabled: true
+      name: "search-configuration"
+    search_history:
+      enabled: true
+      name: "search-history"
+      max_entries: 100
+  
+  # Prompt configuration
+  prompts:
+    enabled: true
+    web_search:
+      enabled: true
+    news_search:
+      enabled: true
+    research:
+      enabled: true
+    debug:
+      enabled: true
