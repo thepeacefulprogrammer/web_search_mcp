@@ -9,6 +9,7 @@ This MCP server enables AI assistants to perform web searches and retrieve up-to
 ### ✅ **Current Status: Production Ready**
 
 - ✅ **Core Web Search**: Fully functional DuckDuckGo integration
+- ✅ **Enhanced Content Extraction**: Smart article parsing with full-text extraction
 - ✅ **OAuth 2.1 Authentication**: PKCE-based secure authentication
 - ✅ **Multi-Transport Support**: HTTP and Server-Sent Events (SSE) 
 - ✅ **Session Management**: Stateful connection handling
@@ -19,10 +20,12 @@ This MCP server enables AI assistants to perform web searches and retrieve up-to
 ### 🎯 **Key Features**
 
 - 🔍 **Real-Time Web Search**: DuckDuckGo integration without API keys
+- 📄 **Advanced Content Extraction**: Three modes - snippet, full-text, and full-content with media
+- 🧠 **Smart Content Analysis**: Word count, reading time, quality scoring, and language detection
+- 📸 **Media Extraction**: Automatic image and link extraction from web pages
 - 🔐 **OAuth 2.1 Security**: PKCE-based authentication for remote access
 - 🌐 **Dual Transport Protocols**: Modern HTTP streaming + legacy SSE support
 - 📱 **Session Management**: Stateful connections with automatic cleanup
-- 📊 **Content Extraction**: Smart content parsing and summarization
 - 🎯 **Search Caching**: Intelligent result caching for performance
 - ⚙️ **Highly Configurable**: Flexible configuration for all aspects
 - 🔒 **Enterprise Security**: Input validation, rate limiting, error handling
@@ -151,7 +154,11 @@ web_search_mcp/
 │       │   └── auth_middleware.py# MCP auth integration
 │       ├── handlers/             # 🛠 MCP tool handlers
 │       │   ├── search_handlers.py# Web search logic
-│       │   └── enhanced_search_handlers.py # Advanced search features
+│       │   └── enhanced_search_handlers.py # Advanced search features with content extraction
+│       ├── extraction/           # 📄 Content extraction engine
+│       │   ├── content_extractor.py # Readability-style content extraction
+│       │   ├── metadata_extractor.py # Structured metadata extraction (JSON-LD, Open Graph)
+│       │   └── document_processor.py # Multi-format document processing
 │       ├── models/               # 📊 Pydantic data models
 │       │   └── search_models.py  # Search request/response models
 │       ├── search/               # 🔍 Search implementations
@@ -172,7 +179,8 @@ web_search_mcp/
 │           ├── logging_config.py # Structured logging
 │           ├── error_handling.py # Error management
 │           ├── validation.py     # Input validation
-│           ├── content_extractor.py # Content parsing
+│           ├── content_cleaner.py # Content cleaning and sanitization
+│           ├── link_extractor.py # Link extraction and categorization
 │           └── search_cache.py   # Result caching
 ├── tests/                        # 🧪 Comprehensive test suite
 │   └── unit/                     # 440+ unit tests
@@ -182,7 +190,12 @@ web_search_mcp/
 │       ├── test_session_management.py # Session handling
 │       ├── test_transports.py    # Transport protocols
 │       ├── test_duckduckgo.py    # Search backend
-│       ├── test_content_extraction.py # Content parsing
+│       ├── test_content_extractor.py # Content extraction engine
+│       ├── test_metadata_extractor.py # Metadata extraction
+│       ├── test_document_processor.py # Document processing
+│       ├── test_content_cleaner.py # Content cleaning utilities
+│       ├── test_link_extractor.py # Link extraction and categorization
+│       ├── test_enhanced_search_handlers.py # Enhanced search integration
 │       ├── test_search_cache.py  # Caching functionality
 │       └── ... (many more)       # Comprehensive coverage
 ├── config/                       # ⚙️ Configuration
@@ -200,26 +213,40 @@ web_search_mcp/
 ## 🛠 **Available MCP Tools**
 
 ### `web_search`
-**Purpose**: Search the web for information using DuckDuckGo with advanced features
+**Purpose**: Search the web for information using DuckDuckGo with advanced content extraction capabilities
 
 **Parameters**:
 - `query` (string, required): Search query (1-500 characters)
 - `max_results` (integer, optional): Maximum results (1-20, default: 10)
 - `search_type` (string, optional): Search type - "web", "news", "images" (default: "web")
 - `time_range` (string, optional): Time filter - "day", "week", "month", "year"
+- `extraction_mode` (string, optional): Content extraction mode - "snippet_only", "full_text", "full_content_with_media" (default: "snippet_only")
+- `search_mode` (string, optional): Search operation mode - "search_only", "search_and_crawl" (default: "search_only")
+- `visual_mode` (string, optional): Visual capture mode - "none", "screenshots" (default: "none")
+- `crawl_depth` (integer, optional): Maximum crawl depth for search_and_crawl mode (1-5, default: 1)
+- `screenshot_viewport` (string, optional): Viewport for screenshots - "desktop", "mobile", "tablet" (default: "desktop")
 
-**Features**:
+**Enhanced Features**:
+- **Content Extraction Modes**:
+  - `snippet_only`: Basic search results with short descriptions (default)
+  - `full_text`: Complete article content with metadata analysis
+  - `full_content_with_media`: Full content plus extracted images and links
+- **Smart Content Analysis**: Word count, reading time, quality scoring, language detection
+- **Media Extraction**: Automatic extraction of images and links from web pages
+- **Performance Tracking**: Separate timing for search vs. extraction operations
 - Real-time web search via DuckDuckGo
-- Content extraction and summarization
 - Result caching for performance
 - Comprehensive error handling
 
-**Example Response**:
+**Example Responses**:
+
+*Basic Search (`extraction_mode: "snippet_only"`):**
 ```json
 {
   "success": true,
   "query": "Python programming tutorials",
-  "max_results": 3,
+  "max_results": 2,
+  "extraction_mode": "snippet_only",
   "results": [
     {
       "title": "Python Tutorial - W3Schools",
@@ -228,7 +255,68 @@ web_search_mcp/
       "snippet": "Learn Python programming with interactive examples..."
     }
   ],
-  "timestamp": "2025-06-20T14:19:54.557129"
+  "total_results": 2,
+  "timestamp": "2025-06-20T16:18:09.724526",
+  "performance": {
+    "total_time_seconds": 1.51,
+    "search_time_seconds": 1.51,
+    "extraction_time_seconds": 0.0
+  }
+}
+```
+
+*Enhanced Search (`extraction_mode: "full_text"`):**
+```json
+{
+  "success": true,
+  "query": "machine learning basics",
+  "max_results": 1,
+  "extraction_mode": "full_text",
+  "results": [
+    {
+      "title": "Basic Concepts in Machine Learning",
+      "url": "https://machinelearningmastery.com/basic-concepts-in-machine-learning/",
+      "description": "Learn the basics of machine learning...",
+      "snippet": "Learn the basics of machine learning from a free online course...",
+      "extracted_content": {
+        "content": "Machine learning is a method of data analysis that automates analytical model building...",
+        "word_count": 1450,
+        "reading_time_minutes": 7,
+        "quality_score": 0.85,
+        "language": "en",
+        "author": "Jason Brownlee",
+        "publish_date": "2024-03-15"
+      }
+    }
+  ],
+  "performance": {
+    "total_time_seconds": 2.34,
+    "search_time_seconds": 1.21,
+    "extraction_time_seconds": 1.13
+  }
+}
+```
+
+*Full Content with Media (`extraction_mode: "full_content_with_media"`):**
+```json
+{
+  "extracted_content": {
+    "content": "Complete article text with full content extraction...",
+    "word_count": 2340,
+    "reading_time_minutes": 12,
+    "quality_score": 0.92,
+    "language": "en",
+    "author": "Dr. Jane Smith",
+    "publish_date": "2024-06-01",
+    "images": [
+      "https://example.com/image1.jpg",
+      "https://example.com/diagram.png"
+    ],
+    "links": [
+      "https://related-article.com",
+      "https://reference-source.org"
+    ]
+  }
 }
 ```
 

@@ -18,6 +18,31 @@ httpx>=0.25.0
 beautifulsoup4>=4.9.0
 fake-useragent>=1.1.0
 
+# Content extraction dependencies
+readability-lxml>=0.8.1
+lxml>=4.9.0
+newspaper3k>=0.2.8
+python-dateutil>=2.8.0
+
+# Content cleaning and sanitization
+bleach>=6.0.0
+
+# Visual intelligence and browser automation
+playwright>=1.40.0
+Pillow>=10.0.0
+
+# Document processing
+PyPDF2>=3.0.0
+python-docx>=0.8.11
+
+# Advanced text processing
+nltk>=3.8.0
+textstat>=0.7.0
+
+# URL and content analysis
+tldextract>=5.0.0
+langdetect>=1.0.9
+
 # Async utilities
 asyncio-tools>=0.3.0
 

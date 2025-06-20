@@ -87,14 +87,19 @@ except ImportError as e:
     sys.exit(1)
 
 try:
-    from web_search_mcp.handlers.search_handlers import (
+    from web_search_mcp.handlers.enhanced_search_handlers import (
         web_search_handler,
+        ExtractionMode,
+        SearchMode,
+        VisualMode,
+    )
+    from web_search_mcp.handlers.search_handlers import (
         get_search_config_handler,
         health_check_handler,
         initialize_search_handlers,
     )
 
-    logger.info("Successfully imported search handlers")
+    logger.info("Successfully imported enhanced search handlers")
 except ImportError as e:
     logger.error(f"Failed to import search handlers: {e}")
     logger.error(f"Traceback: {traceback.format_exc()}")
@@ -220,7 +225,7 @@ class WebSearchMCPServer:
         # Web search tool
         @self.mcp.tool(
             name="web_search",
-            description="Search the web for information using DuckDuckGo search engine. Returns JSON-formatted search results with titles, URLs, descriptions, and metadata."
+            description="Search the web for information using DuckDuckGo search engine. Returns JSON-formatted search results with titles, URLs, descriptions, and metadata. Supports enhanced content extraction modes."
         )
         async def web_search(
             query: Annotated[str, Field(
@@ -245,9 +250,35 @@ class WebSearchMCPServer:
                 pattern="^(day|week|month|year)$",
                 default=None
             )] = None,
+            extraction_mode: Annotated[str, Field(
+                description="Content extraction mode: snippet_only (default), full_text, or full_content_with_media",
+                pattern="^(snippet_only|full_text|full_content_with_media)$",
+                default="snippet_only"
+            )] = "snippet_only",
+            search_mode: Annotated[str, Field(
+                description="Search operation mode: search_only (default) or search_and_crawl",
+                pattern="^(search_only|search_and_crawl)$",
+                default="search_only"
+            )] = "search_only",
+            visual_mode: Annotated[str, Field(
+                description="Visual capture mode: none (default) or screenshots",
+                pattern="^(none|screenshots)$",
+                default="none"
+            )] = "none",
+            crawl_depth: Annotated[int, Field(
+                description="Maximum crawl depth for search_and_crawl mode",
+                ge=1,
+                le=5,
+                default=1
+            )] = 1,
+            screenshot_viewport: Annotated[str, Field(
+                description="Viewport for screenshots: desktop (default), mobile, or tablet",
+                pattern="^(desktop|mobile|tablet)$",
+                default="desktop"
+            )] = "desktop",
         ) -> str:
-            """Search the web for information using DuckDuckGo search engine."""
-            logger.info(f"web_search called with query: {query}, max_results: {max_results}, search_type: {search_type}, time_range: {time_range}")
+            """Search the web for information using DuckDuckGo search engine with enhanced features."""
+            logger.info(f"web_search called with query: {query}, max_results: {max_results}, extraction_mode: {extraction_mode}")
             await self._ensure_async_initialized()
 
             try:
@@ -285,9 +316,21 @@ class WebSearchMCPServer:
                     else:
                         return f"❌ Invalid input: {ve.message}"
                 
+                # Convert string enums to enum objects
+                from web_search_mcp.handlers.enhanced_search_handlers import ExtractionMode, SearchMode, VisualMode
+                
+                extraction_mode_enum = ExtractionMode(extraction_mode)
+                search_mode_enum = SearchMode(search_mode)
+                visual_mode_enum = VisualMode(visual_mode)
+                
                 result = await web_search_handler(
                     query=validated_params.get('query', query),
                     max_results=validated_params.get('max_results', max_results),
+                    extraction_mode=extraction_mode_enum,
+                    search_mode=search_mode_enum,
+                    visual_mode=visual_mode_enum,
+                    crawl_depth=crawl_depth,
+                    screenshot_viewport=screenshot_viewport,
                 )
                 
                 # Add search to history for MCP resource tracking

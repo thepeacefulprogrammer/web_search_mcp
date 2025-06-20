@@ -1,0 +1,6 @@
+Collecting bleach
+  Using cached bleach-6.2.0-py3-none-any.whl.metadata (30 kB)
+Requirement already satisfied: webencodings in /home/randy/.pyenv/versions/3.11.9/lib/python3.11/site-packages (from bleach) (0.5.1)
+Using cached bleach-6.2.0-py3-none-any.whl (163 kB)
+Installing collected packages: bleach
+Successfully installed bleach-6.2.0
